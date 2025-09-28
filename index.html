@@ -7,8 +7,11 @@
     <!-- Le ponemos un titulo -->
     <title>The Devil's Herd</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
+
+    <!-- Agregamos las configuraciones al canvas -->
     <script>
       let app;
+      let keys = {};
       window.onload = function () {
         app = new PIXI.Application({
           width: 3000,
@@ -24,12 +27,50 @@
 
         app.stage.addChild(background);
 
+
         //Agregamos un sprite para el personaje principal de prueba
         const granjera = PIXI.Sprite.from("images/player.png");
         granjera.x = app.screen.width / 2;
         granjera.y = app.screen.height / 2;
         granjera.anchor.set(0.5);
         app.stage.addChild(granjera);
+
+
+        //Agregamos movimiento "wasd" al personaje
+        //Eventos del teclado
+        window.addEventListener("keydown", keysDown);
+        window.addEventListener("keyup", keysUp);
+
+        //Para repetir el evento
+        app.ticker.add(gameloop)
+
+        function keysDown(e){
+          keys[e.keyCode] = true;
+        }
+
+        function keysUp(e){
+          keys[e.keyCode] = false;
+        }
+
+        function gameloop(){
+          //TECLA W
+          if(keys[87]){
+            granjera.y -= 20;
+          }
+          //TECLA S
+          if(keys[83]){
+            granjera.y += 20;
+          }
+          //TECLA A
+          if(keys[65]){
+            granjera.x -= 20;
+          }
+          //TECLA D
+          if(keys[68]){
+            granjera.x += 20;
+          }
+        }
+
       };
     </script>
   </head>
