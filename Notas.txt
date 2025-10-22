@@ -1,0 +1,8 @@
+👩‍🌾Hacemos que la granjera siga el puntero del mouse
+ app.stage.interactive = true;
+ app.stage.on('pointermove', (event) => {
+     const pointerPosition = event.data.global;
+     granjera.x = pointerPosition.x;
+     granjera.y = pointerPosition.y;
+});
+

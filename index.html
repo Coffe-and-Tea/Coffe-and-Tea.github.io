@@ -3,76 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <!-- Le ponemos un titulo -->
     <title>The Devil's Herd</title>
+    <!-- Cargamos la libreria de pixi -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
-
-    <!-- Agregamos las configuraciones al canvas -->
-    <script>
-      let app;
-      let keys = {};
-      window.onload = function () {
-        app = new PIXI.Application({
-          width: 3000,
-          height: 1800,
-        });
-
-        document.body.appendChild(app.view);
-
-        //Agregamos un fondo al canvas
-        const background = PIXI.Sprite.from("images/fondo-pasto.png");
-        background.width = app.screen.width;
-        background.height = app.screen.height;
-
-        app.stage.addChild(background);
-
-
-        //Agregamos un sprite para el personaje principal
-        const granjera = PIXI.Sprite.from("images/granjera.png");
-        granjera.x = app.screen.width / 2;
-        granjera.y = app.screen.height / 2;
-        granjera.anchor.set(0.5);
-        app.stage.addChild(granjera);
-
-
-        //Agregamos movimiento "wasd" al personaje
-        //Eventos del teclado
-        window.addEventListener("keydown", keysDown);
-        window.addEventListener("keyup", keysUp);
-
-        //Para repetir el evento
-        app.ticker.add(gameloop)
-
-        function keysDown(e){
-          keys[e.keyCode] = true;
-        }
-
-        function keysUp(e){
-          keys[e.keyCode] = false;
-        }
-
-        function gameloop(){
-          //TECLA W
-          if(keys[87]){
-            granjera.y -= 20;
-          }
-          //TECLA S
-          if(keys[83]){
-            granjera.y += 20;
-          }
-          //TECLA A
-          if(keys[65]){
-            granjera.x -= 20;
-          }
-          //TECLA D
-          if(keys[68]){
-            granjera.x += 20;
-          }
-        }
-
-      };
-    </script>
   </head>
-  <body></body>
+
+  <body>
+    <!-- Cargamos el archivo del juego -->
+    <script src="js/juego.js"></script>
+    <!-- Cargamos el archivo del jugador -->
+    <script src="js/granjera.js"></script>
+  </body>
+
 </html>
