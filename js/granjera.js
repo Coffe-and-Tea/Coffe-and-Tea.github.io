@@ -94,7 +94,14 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
     animSprite.anchor.set(0.5);
     animSprite.x = characterPos.x;
     animSprite.y = characterPos.y;
-    animSprite.animationSpeed = 0.15;
+
+    // AJUSTE DE VELOCIDAD: Más lento para IDLE
+    if (keyName.startsWith("idle")) {
+      animSprite.animationSpeed = 0.1; // Velocidad lenta para reposo
+    } else {
+      animSprite.animationSpeed = 0.15; // Velocidad normal para caminar
+    }
+
     animSprite.visible = false;
     animSprite.scale.x = Math.abs(animSprite.scale.x || 1);
     app.stage.addChild(animSprite);
@@ -227,7 +234,7 @@ function gameloop() {
       if (keys[65]) {
         // Izquierda
         anim.scale.x = -baseScale;
-        lastDirectionKey = "idle1"; // Usamos 'idle1' como marcador, aunque carguemos 'idle4'
+        lastDirectionKey = "idle1"; // Marcador para reposo izquierda
         lastScaleX = -baseScale; // GUARDAR LA ORIENTACIÓN NEGATIVA
       } else if (keys[68]) {
         // Derecha
