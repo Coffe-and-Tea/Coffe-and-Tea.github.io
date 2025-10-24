@@ -6,3 +6,4 @@
      granjera.y = pointerPosition.y;
 });
 
+- Ordenar el codigo de granjera 

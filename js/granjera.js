@@ -5,9 +5,11 @@ granjera.x = app.screen.width / 2;
 granjera.y = app.screen.height / 2;
 app.stage.addChild(granjera);
 
+
 // Variables y referencias 
 let keys = {}; 
 let granjeraAnimada = null; 
+
 
 // Para guardar las animaciones 
 const animSprites = {}; 
@@ -24,6 +26,7 @@ function hideAllAnims() {
   });
 }
 
+
 function showAnim(key) {
   const s = animSprites[key];
   if (!s) return;
@@ -36,18 +39,10 @@ function showAnim(key) {
   if (!s.playing) s.play();
 }
 
+
 // Cargamos los spritesheets
 function setupFromSheetData(sheetData, baseImagePath, keyName) {
-  // sheetData es el JSON (texturepacker style). baseImagePath es la ruta al PNG
-  // if (!sheetData || !sheetData.animations || !sheetData.frames) {
-  //   console.warn('Spritesheet JSON no tiene la estructura esperada');
-  //   return;
-  // }
   const animList = sheetData.animations.walk;
-  // if (!animList || !Array.isArray(animList)) {
-  //   console.warn('Animacion "walk" no encontrada en el JSON');
-  //   return;
-  // }
 
   // Crear baseTexture desde la imagen del spritesheet
   const baseTex = PIXI.BaseTexture.from(baseImagePath);
@@ -80,29 +75,9 @@ if (PIXI.Loader && PIXI.Loader.shared && typeof PIXI.Loader.shared.add === 'func
   PIXI.Loader.shared.load((loader, resources) => {
     sheets.forEach(s => {
       const res = resources[s];
-      // if (res && res.spritesheet && res.spritesheet.animations && res.spritesheet.animations.walk) {
-      //   const sheet = res.spritesheet;
-      //   const frames = sheet.animations.walk.map(name => sheet.textures[name]);
-      //   const animSprite = new PIXI.AnimatedSprite(frames);
-
-      //   animSprite.anchor.set(0.5);
-      //   animSprite.x = granjera.x;
-      //   animSprite.y = granjera.y;
-      //   animSprite.animationSpeed = 0.15;
-      //   animSprite.visible = false;
-      //   animSprite.scale.x = Math.abs(animSprite.scale.x || 1);
-      //   app.stage.addChild(animSprite);
-      //   animSprites[s] = animSprite;
-
-      // } else {
-      //   // fallback: intentar fetch manual
-      //   fetch(`animaciones/${s}.json`).then(r => r.json()).then(json => {
-      //     const baseImage = (json.meta && json.meta.image) ? `animaciones/${json.meta.image}` : `animaciones/${s}.png`;
-      //     setupFromSheetData(json, baseImage, s);
-      //   }).catch(err => console.error('Error leyendo JSON del spritesheet:', err));
-      // }
     });
   });
+
 } else {
   // fallback: fetch cada JSON
   sheets.forEach(s => {
@@ -113,6 +88,7 @@ if (PIXI.Loader && PIXI.Loader.shared && typeof PIXI.Loader.shared.add === 'func
   });
 }
 
+
 // Agregamos el movimiento "WASD" del teclado 
 window.addEventListener('keydown', keysDown);
 window.addEventListener('keyup', keysUp);
@@ -120,17 +96,20 @@ window.addEventListener('keyup', keysUp);
 function keysDown(e) { keys[e.keyCode] = true; }
 function keysUp(e) { keys[e.keyCode] = false; }
 
+
 // Gameloop para el movimiento y poder controlar la animación
 function gameloop() {
   let moving = false;
 
+
 // Seleccionamos la animación por tecla
   const mapKeyToAnim = {
     87: 'walk1', // W
-    65: 'walk2', // A
+    65: 'walk4', // A (usando walk4 invertida)
     83: 'walk3', // S
     68: 'walk4'  // D
   };
+
 
 // Movimiento base por tecla (se mueve la animSprite si existe, si no, el sprite estático)
   if (keys[87]) { // W
@@ -163,10 +142,11 @@ function gameloop() {
 
   if (keys[65]) { // A
     moving = true;
-    const anim = animSprites['walk2'];
+    const anim = animSprites['walk4'];
     if (anim) {
       hideAllAnims();
-      showAnim('walk2');
+      showAnim('walk4');
+      anim.scale.x = -Math.abs(anim.scale.x || 1); // Invertimos la animación
       anim.x -= 4;
       granjera.x = anim.x;
     } else {
@@ -200,6 +180,7 @@ function gameloop() {
     }
   }
 }
+
 
 // Se añade el gameloop al ticker
 if (app && app.ticker) app.ticker.add(gameloop);
