@@ -2,6 +2,7 @@ Cosas por terminar/ implementar:
     Granjera:
         - Ordenar el codigo de granjera 
         - Agregar animaciones de ataque 
+        - Movimiento de la camara.
 
     Animales:
         - Agregar animaciones basicas de movimiento
@@ -13,6 +14,7 @@ Cosas por terminar/ implementar:
         - ballas (opcional)
         - fardos (opcional)
         - rocas  (opcional)
+        - granja
 
     Hud:
         - Agregar contador de animales sanos
@@ -20,9 +22,8 @@ Cosas por terminar/ implementar:
         - Agregar temporizador 
 
     Extras:
-        - Agregar asset de granja (solo estetico)
         - Menu 
-        - Readme git
+        - ReadMe git
 
 
 Codigo util y funcional:

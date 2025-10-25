@@ -122,7 +122,6 @@ const sheets = [
   "walk1", // Arriba
   "walk3", // Abajo
   "walk4", // Izquierda/Derecha
-  //"idle1", // <<--- IDLE1 ELIMINADO para reutilizar idle4
   "idle2", // Reposo Arriba
   "idle3", // Reposo Abajo
   "idle4", // Reposo Derecha
