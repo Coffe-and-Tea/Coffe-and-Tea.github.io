@@ -1,7 +1,3 @@
-// =========================================================
-// === ARCHIVO DE SIMULACIÓN BOID (CABRAS) - CÓDIGO FINAL ===
-// =========================================================
-
 // Configuración global y referencias
 const numGoats = 60;
 const flock = [];
@@ -10,12 +6,11 @@ const loadedTextures = {}; // Almacena los frames de animación cargados
 // Definiciones de las rutas
 const SHEETS = ["goat_beige_w", "goat_beige_a", "goat_beige_s", "goat_beige_d"];
 
-// 🚨 RUTA FINAL: Usamos la ruta ABSOLUTA que funciona con Live Server.
 // Esto asume que 'animaciones_animales' está en la raíz de tu proyecto (junto a index.html y js).
 const BASE_PATH = "/animaciones_animales/cabra_beige/";
 
 // =========================================================
-// === 1. CLASE GOATBOID (Boid con Animación Direccional) ===
+// **  1. CLASE GOATBOID (Boid con Animación Direccional) **
 // =========================================================
 
 class GoatBoid {
@@ -193,9 +188,9 @@ class GoatBoid {
   }
 }
 
-// =========================================================
-// === 2. FUNCIONES DE CARGA E INICIALIZACIÓN ===
-// =========================================================
+// ==============================================
+// **  2. FUNCIONES DE CARGA E INICIALIZACIÓN  **
+// ==============================================
 
 function createFlock() {
   for (let i = 0; i < numGoats; i++) {
@@ -276,9 +271,9 @@ function extractFrames(sheetData, sheetName) {
     .filter(Boolean); // Eliminamos cualquier frame nulo o mal formado
 }
 
-// =========================================================
-// === 3. INICIO DEL PROGRAMA: Carga Asíncrona (PIXI.Assets) ===
-// =========================================================
+// ===========================================================
+// ** 3. INICIO DEL PROGRAMA: Carga Asíncrona (PIXI.Assets) **
+// ===========================================================
 
 async function loadGoatAssets() {
   const manifest = {
@@ -303,7 +298,6 @@ async function loadGoatAssets() {
     SHEETS.forEach((s) => {
       let resource = resources[s];
 
-      // 🚨 Corrección Crítica: Accedemos a .data si PixiJS lo envolvió en un Spritesheet, sino usamos el objeto crudo.
       const sheetData = resource.data || resource;
 
       if (sheetData && sheetData.frames) {

@@ -24,6 +24,7 @@ Cosas por terminar/ implementar:
     Extras:
         - Menu 
         - ReadMe git
+        - Hacer que el juego transcurra de noche e implementar iluminaciones
 
 
 Codigo util y funcional:

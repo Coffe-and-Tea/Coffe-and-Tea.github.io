@@ -1,19 +1,13 @@
-// =========================================================
-// *** INICIALIZACIÓN DE VARIABLES GLOBALES ***
-// =========================================================
-
-// La instancia 'app' de PIXI.Application debe estar definida antes de este bloque.
-
 // Posición central del personaje: Esta es la "verdad" de la posición.
 let characterPos = {
   x: app.screen.width / 2,
   y: app.screen.height / 2,
 };
 
-// **VARIABLE DE ESTADO:** Para recordar la última dirección de caminata (Abajo por defecto).
+// variable de estado: Para recordar la última dirección de caminata (Abajo por defecto).
 let lastDirectionKey = "idle3";
 
-// **VARIABLE CLAVE:** Almacena la escala horizontal final (-1 para izquierda, +1 para derecha).
+// variable clave: Almacena la escala horizontal final (-1 para izquierda, +1 para derecha).
 let lastScaleX = 1;
 
 // Agregamos un sprite estatico (usado como fallback si falla la carga o el idle)
@@ -26,6 +20,10 @@ app.stage.addChild(granjera);
 // Variables y referencias
 let keys = {};
 const animSprites = {}; // Para guardar las animaciones
+
+// ** NUEVOS PARÁMETROS DE INTERACCIÓN **
+const KILL_KEY_CODE = 32; // Código de tecla para matar (32 es la barra espaciadora)
+const KILL_RADIUS = 40; // Distancia máxima en píxeles para que la granjera pueda interactuar/matar
 
 // ===========================================
 // *** FUNCIONES HELPERS ***
@@ -46,13 +44,12 @@ function hideAllAnims() {
 function showAnim(key) {
   const s = animSprites[key];
   if (!s) return;
-  s.visible = true; // Ocultamos el sprite estático para evitar superposición
-
+  s.visible = true;
   granjera.visible = false;
   if (!s.playing) s.play();
 }
 
-// Función robusta para leer animaciones del JSON
+// Función robusta para leer animaciones del JSON (Mantenida igual)
 function setupFromSheetData(sheetData, baseImagePath, keyName) {
   if (!sheetData || !sheetData.animations) {
     console.warn(
@@ -95,7 +92,7 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
     animSprite.x = characterPos.x;
     animSprite.y = characterPos.y;
 
-    // AJUSTE DE VELOCIDAD: Más lento para IDLE
+    // Para que el idle vaya mas lento
     if (keyName.startsWith("idle")) {
       animSprite.animationSpeed = 0.1; // Velocidad lenta para reposo
     } else {
@@ -114,10 +111,10 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
 }
 
 // =======================================================
-// *** CARGA DE ANIMACIONES ***
+// *** CARGA DE ANIMACIONES (Mantenida igual) ***
 // =======================================================
 
-// Lista de todas las animaciones a cargar (SIN IDLE1: Se reutiliza idle4)
+// Lista de todas las animaciones a cargar
 const sheets = [
   "walk1", // Arriba
   "walk3", // Abajo
@@ -181,15 +178,16 @@ function keysUp(e) {
   keys[e.keyCode] = false;
 }
 
-// Gameloop para el movimiento y control de animación/idle
+// Gameloop para el movimiento, animación y la INTERACCIÓN DE MATANZA
 function gameloop() {
   let moving = false;
   const speed = 4;
   let currentAnimKey = null;
 
   let movedX = false;
-  let movedY = false; // --- 1. Determinar Movimiento y Actualizar Posición Central (characterPos) ---
+  let movedY = false;
 
+  // --- LÓGICA DE MOVIMIENTO ---
   if (keys[87]) {
     // W (Arriba)
     movedY = true;
@@ -218,14 +216,17 @@ function gameloop() {
     currentAnimKey = "walk4";
   }
 
-  moving = movedX || movedY; // --- 2. Sincronizar Sprites y Manejar Animación ---
+  moving = movedX || movedY;
+
+  // --- LÓGICA DE ANIMACIÓN (Caminata/Idle) ---
+  // ... (El código de animación de caminata y idle se mantiene igual)
 
   if (moving && currentAnimKey && animSprites[currentAnimKey]) {
-    // A. MOVIMIENTO ACTIVO
+    // Animacion de walk
     hideAllAnims();
     showAnim(currentAnimKey);
 
-    const anim = animSprites[currentAnimKey]; // LÓGICA DE ESCALA INVERSA y Actualización de lastDirectionKey y lastScaleX
+    const anim = animSprites[currentAnimKey];
 
     if (currentAnimKey === "walk4") {
       const baseScale = Math.abs(anim.scale.x || 1);
@@ -233,31 +234,30 @@ function gameloop() {
       if (keys[65]) {
         // Izquierda
         anim.scale.x = -baseScale;
-        lastDirectionKey = "idle1"; // Marcador para reposo izquierda
-        lastScaleX = -baseScale; // GUARDAR LA ORIENTACIÓN NEGATIVA
+        lastDirectionKey = "idle1";
+        lastScaleX = -baseScale;
       } else if (keys[68]) {
         // Derecha
         anim.scale.x = baseScale;
-        lastDirectionKey = "idle4"; // Set Idle Derecha
-        lastScaleX = baseScale; // GUARDAR LA ORIENTACIÓN POSITIVA
+        lastDirectionKey = "idle4";
+        lastScaleX = baseScale;
       }
     } else {
       // Asegurar que las animaciones verticales no estén invertidas
       anim.scale.x = Math.abs(anim.scale.x || 1);
 
       // Actualizar la última dirección para W y S
-      if (currentAnimKey === "walk1") lastDirectionKey = "idle2"; // Set Idle Arriba
-      if (currentAnimKey === "walk3") lastDirectionKey = "idle3"; // Set Idle Abajo
-    } // SINCRONIZACIÓN CLAVE: El sprite animado toma la posición central
+      if (currentAnimKey === "walk1") lastDirectionKey = "idle2";
+      if (currentAnimKey === "walk3") lastDirectionKey = "idle3";
+    }
 
     anim.x = characterPos.x;
     anim.y = characterPos.y;
   } else {
-    // B. REPOSO (IDLE)
+    // Animacion de idle
     hideAllAnims();
     let idleKey = lastDirectionKey;
 
-    // *** LÓGICA DE REUTILIZACIÓN DE IDLE4 PARA IZQUIERDA (IDLE1) ***
     // Si la última dirección es "idle1" (izquierda), usamos el sprite "idle4"
     if (idleKey === "idle1") {
       idleKey = "idle4";
@@ -273,7 +273,6 @@ function gameloop() {
 
       // Aplicar la escala horizontal guardada (solo para idle4)
       if (idleKey === "idle4") {
-        // lastScaleX es -1 si la última dirección fue izquierda, y +1 si fue derecha
         idleAnim.scale.x = lastScaleX;
       } else {
         // Asegurar que los idle verticales (idle2, idle3) tengan escala positiva
@@ -287,6 +286,47 @@ function gameloop() {
       granjera.x = characterPos.x;
       granjera.y = characterPos.y;
       granjera.visible = true;
+    }
+  }
+
+  // ===============================================
+  // 🔪 LÓGICA DE INTERACCIÓN Y MATANZA (NUEVO) 🔪
+  // ===============================================
+
+  // NOTA: 'flock' debe ser un array global que contenga las instancias de GoatBoid
+  // (Definido en tu archivo de cabras/ovejas)
+  if (keys[KILL_KEY_CODE] && typeof flock !== "undefined") {
+    // Obtenemos la posición real de la granjera
+    const granjeraX = characterPos.x;
+    const granjeraY = characterPos.y;
+
+    // Iteramos el array 'flock' hacia atrás para poder eliminar elementos de forma segura
+    for (let i = flock.length - 1; i >= 0; i--) {
+      const animal = flock[i];
+
+      // Si el animal no es válido o ya fue eliminado, saltamos
+      if (!animal || !animal.sprite) continue;
+
+      // Calcular la distancia
+      const dx = animal.sprite.x - granjeraX;
+      const dy = animal.sprite.y - granjeraY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Condición de Muerte/Interacción
+      if (distance < KILL_RADIUS) {
+        // Llamamos al método de eliminación que debe estar en la clase GoatBoid
+        if (typeof animal.removeSelf === "function") {
+          animal.removeSelf();
+        } else {
+          // Fallback si removeSelf no existe (¡debes añadirlo a GoatBoid!)
+          console.error("Falta el método removeSelf() en la clase del animal.");
+          animal.sprite.visible = false;
+          flock.splice(i, 1);
+        }
+
+        // Si la granjera solo puede matar un animal por pulsación de tecla, salimos:
+        break;
+      }
     }
   }
 }

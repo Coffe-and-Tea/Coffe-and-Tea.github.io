@@ -8,7 +8,7 @@ const app = new PIXI.Application({
 document.body.appendChild(app.view);
 
 // Agregamos el fondo a la escena
-const background = PIXI.Sprite.from("images/fondo-pasto.png");
+const background = PIXI.Sprite.from("images/pasto.png");
 background.width = app.screen.width;
 background.height = app.screen.height;
 background.anchor.set(0);
