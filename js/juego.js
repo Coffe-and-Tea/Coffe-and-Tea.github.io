@@ -15,3 +15,12 @@ background.anchor.set(0);
 background.x = 0;
 background.y = 0;
 app.stage.addChild(background);
+
+// Agregamos una granja a la escena (DE PRUEBA)
+const farm = PIXI.Sprite.from("images/farm.png");
+farm.width = 320;
+farm.height = 320;
+farm.anchor.set(0);
+farm.x = app.screen.width / 2,
+farm.y = app.screen.height / 2,
+app.stage.addChild(farm);

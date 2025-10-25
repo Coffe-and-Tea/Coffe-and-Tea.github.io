@@ -1,0 +1,39 @@
+{"frames": {
+
+"goat027.png":
+{
+	"frame": {"x":1,"y":1,"w":38,"h":36},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":7,"y":12,"w":38,"h":36},
+	"sourceSize": {"w":48,"h":48}
+},
+"goat028.png":
+{
+	"frame": {"x":1,"y":77,"w":38,"h":37},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":7,"y":11,"w":38,"h":37},
+	"sourceSize": {"w":48,"h":48}
+},
+"goat029.png":
+{
+	"frame": {"x":1,"y":39,"w":39,"h":36},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":6,"y":12,"w":39,"h":36},
+	"sourceSize": {"w":48,"h":48}
+}},
+"animations": {
+	"goat": ["goat027.png","goat028.png","goat029.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "goat_beige_d.png",
+	"format": "RGBA8888",
+	"size": {"w":41,"h":115},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:fb8972a0dab132075262fd90a4a7085c:d00e9891dc1c68ed1b56d7a788d9fc33:1430debb778f3d05ffea2a5bf9fbbc21$"
+}
+}

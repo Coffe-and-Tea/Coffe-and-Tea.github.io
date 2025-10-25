@@ -1,0 +1,39 @@
+{"frames": {
+
+"cabritas012.png":
+{
+	"frame": {"x":1,"y":1,"w":38,"h":36},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":2,"y":12,"w":38,"h":36},
+	"sourceSize": {"w":48,"h":48}
+},
+"cabritas013.png":
+{
+	"frame": {"x":1,"y":77,"w":38,"h":37},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":2,"y":11,"w":38,"h":37},
+	"sourceSize": {"w":48,"h":48}
+},
+"cabritas014.png":
+{
+	"frame": {"x":1,"y":39,"w":39,"h":36},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":2,"y":12,"w":39,"h":36},
+	"sourceSize": {"w":48,"h":48}
+}},
+"animations": {
+	"cabritas": ["cabritas012.png","cabritas013.png","cabritas014.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "goat_black_a.png",
+	"format": "RGBA8888",
+	"size": {"w":41,"h":115},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:26dbe8a250d3652bdefcb839edb25e4a:708921f81b6ba4df6b2e82ec710cfd4c:42aea122112101497f68c6d93bb9d6f1$"
+}
+}

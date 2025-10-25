@@ -6,6 +6,13 @@ Cosas por terminar/ implementar:
     Animales:
         - Agregar animaciones basicas de movimiento
         - Implemenar mecanica de muerte
+        - Implemenar movimiento boid (grupos)
+        - Implemenar movimiento pausado (encarnados)
+
+    Obstaculos:
+        - ballas (opcional)
+        - fardos (opcional)
+        - rocas  (opcional)
 
     Hud:
         - Agregar contador de animales sanos
@@ -15,6 +22,8 @@ Cosas por terminar/ implementar:
     Extras:
         - Agregar asset de granja (solo estetico)
         - Menu 
+        - Readme git
+
 
 Codigo util y funcional:
     Hace que la granjera siga el puntero del mouse:
