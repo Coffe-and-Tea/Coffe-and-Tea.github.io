@@ -1,5 +1,5 @@
 // Configuración global y referencias
-const numGoats = 60;
+const numGoats = 77;
 const flock = [];
 const loadedTextures = {}; // Almacena los frames de animación cargados
 
