@@ -31,3 +31,11 @@ const piedra = PIXI.Sprite.from("images/piedra.png");
 piedra.width = 100;
 piedra.height = 70;
 app.stage.addChild(piedra);
+
+
+// Iniciamos el temporizador cuando la ventana cargue
+window.addEventListener('load', () => {
+    if (window.gameTimer) {
+        window.gameTimer.start();
+    }
+});
