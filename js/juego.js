@@ -3,6 +3,7 @@ const app = new PIXI.Application({
   width: 1920,
   height: 1080,
   antialias: true,
+  resizeTo: window,
 });
 
 document.body.appendChild(app.view);
@@ -21,8 +22,8 @@ farm.width = 600;
 farm.height = 320;
 farm.anchor.set(0);
 (farm.x = app.screen.width / 2),
-(farm.y = app.screen.height / 2),
-app.stage.addChild(farm);
+  (farm.y = app.screen.height / 2),
+  app.stage.addChild(farm);
 background.x = 0;
 background.y = 0;
 

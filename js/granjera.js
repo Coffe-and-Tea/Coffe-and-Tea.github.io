@@ -60,9 +60,8 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
       `[Carga Fallida] El JSON para ${keyName} está incompleto o mal formado (falta 'animations').`
     );
     return;
-  }
+  } // Intentamos encontrar la lista de frames: 'walk', 'idle', o la primera lista disponible
 
-  // Intentamos encontrar la lista de frames: 'walk', 'idle', o la primera lista disponible
   let animList =
     sheetData.animations.walk ||
     sheetData.animations.idle ||
@@ -80,9 +79,8 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
       `[Carga Crítica] No se encontró una lista de frames válida (walk/idle/otra) en el JSON de ${keyName}.`
     );
     return;
-  }
+  } // --- Lógica de creación del AnimatedSprite ---
 
-  // --- Lógica de creación del AnimatedSprite ---
   const baseTex = PIXI.BaseTexture.from(baseImagePath);
   const frames = animList
     .map((name) => {
@@ -97,9 +95,8 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
     const animSprite = new PIXI.AnimatedSprite(frames);
     animSprite.anchor.set(0.5);
     animSprite.x = characterPos.x;
-    animSprite.y = characterPos.y;
+    animSprite.y = characterPos.y; // Velocidad de animación
 
-    // Velocidad de animación
     if (keyName.startsWith("idle")) {
       animSprite.animationSpeed = 0.1; // Velocidad lenta para reposo
     } else if (keyName.startsWith("attack")) {
@@ -109,12 +106,11 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
       animSprite.animationSpeed = 0.15; // Velocidad normal para caminar
     }
 
-  animSprite.visible = false;
-  animSprite.scale.x = Math.abs(animSprite.scale.x || 1);
-  app.stage.addChild(animSprite);
-  if (keyName) animSprites[keyName] = animSprite;
+    animSprite.visible = false;
+    animSprite.scale.x = Math.abs(animSprite.scale.x || 1);
+    app.stage.addChild(animSprite);
+    if (keyName) animSprites[keyName] = animSprite; // Lógica para devolver al estado IDLE después de un ataque
 
-    // Lógica para devolver al estado IDLE después de un ataque
     if (keyName.startsWith("attack")) {
       animSprite.onComplete = () => {
         isAttacking = false;
@@ -140,10 +136,9 @@ const sheets = [
   "idle2", // Reposo Arriba
   "idle3", // Reposo Abajo
   "idle4", // Reposo Derecha
-  "attack1", // ATAQUE Arriba (NUEVO)
-  "attack2", // ATAQUE Izquierda (NUEVO - Usará escala horizontal negativa de attack4)
-  "attack3", // ATAQUE Abajo (NUEVO)
-  "attack4", // ATAQUE Derecha (NUEVO)
+  "attack1", // ATAQUE Arriba
+  "attack2", // ATAQUE Izquierda/Derecha (Ahora usado para ambos)
+  "attack3", // ATAQUE Abajo
 ];
 
 if (
@@ -210,11 +205,11 @@ function getAttackAnimKey() {
       return "attack1";
     case "idle3": // Abajo
       return "attack3";
-    case "idle1": // Izquierda (usamos escala negativa de idle4)
-      return "attack2";
+    case "idle1": // Izquierda
+      return "attack2"; // Usamos attack2
     case "idle4": // Derecha
     default:
-      return "attack4";
+      return "attack2"; // <<-- CAMBIO: Usamos attack2 para la derecha también
   }
 }
 
@@ -225,41 +220,39 @@ function gameloop() {
   let currentAnimKey = null;
 
   let movedX = false;
-  let movedY = false;
+  let movedY = false; // 1. --- LÓGICA DE ATAQUE (Prioridad Máxima) ---
 
-  // 1. --- LÓGICA DE ATAQUE (Prioridad Máxima) ---
   if (keys[KILL_KEY_CODE] && !isAttacking && typeof flock !== "undefined") {
     isAttacking = true;
     keys[KILL_KEY_CODE] = false; // Consumir la pulsación para que no sea automático
-    currentAnimKey = getAttackAnimKey();
+    currentAnimKey = getAttackAnimKey(); // Ejecutar lógica de eliminación solo al inicio del ataque
 
-    // Ejecutar lógica de eliminación solo al inicio del ataque
     performKillLogic();
-  }
+  } // Si estamos atacando, no se permite el movimiento (bloqueo de input)
 
-  // Si estamos atacando, no se permite el movimiento (bloqueo de input)
   if (isAttacking) {
-    currentAnimKey = getAttackAnimKey(); // Forzar la animación de ataque
+    currentAnimKey = getAttackAnimKey(); // Forzar la animación de ataque // Sincronizar el sprite de ataque y salir del bucle de movimiento/idle
 
-    // Sincronizar el sprite de ataque y salir del bucle de movimiento/idle
     const attackAnim = animSprites[currentAnimKey];
     if (attackAnim) {
       hideAllAnims();
       showAnim(currentAnimKey);
       attackAnim.x = characterPos.x;
-      attackAnim.y = characterPos.y;
+      attackAnim.y = characterPos.y; // Aplicar escala horizontal correcta para ataques laterales (attack2)
 
-      // Aplicar escala horizontal correcta para attack2 (izquierda)
       if (currentAnimKey === "attack2") {
-        attackAnim.scale.x = -Math.abs(attackAnim.scale.x || 1);
+        // <<-- CORRECCIÓN: Invertimos la escala (multiplicamos por -1) para corregir el giro.
+        // Esto asume que el sprite de ataque lateral (attack2) está dibujado mirando
+        // en la dirección opuesta a la animación de caminar (walk4).
+        attackAnim.scale.x = lastScaleX * -1;
       } else {
+        // Asegurar que los ataques verticales (attack1, attack3) tengan escala positiva
         attackAnim.scale.x = Math.abs(attackAnim.scale.x || 1);
       }
     }
     return; // Salir del gameloop para que no se ejecute la lógica de movimiento/idle
-  }
+  } // 2. --- LÓGICA DE MOVIMIENTO (Solo si NO está atacando) ---
 
-  // 2. --- LÓGICA DE MOVIMIENTO (Solo si NO está atacando) ---
   if (keys[87]) {
     // W (Arriba)
     movedY = true;
@@ -288,9 +281,7 @@ function gameloop() {
     currentAnimKey = "walk4";
   }
 
-  moving = movedX || movedY;
-
-  // 3. --- LÓGICA DE ANIMACIÓN (Caminata/Idle) ---
+  moving = movedX || movedY; // 3. --- LÓGICA DE ANIMACIÓN (Caminata/Idle) ---
 
   if (moving && currentAnimKey && animSprites[currentAnimKey]) {
     // Animacion de walk
@@ -315,13 +306,11 @@ function gameloop() {
       }
     } else {
       // Asegurar que las animaciones verticales no estén invertidas
-      anim.scale.x = Math.abs(anim.scale.x || 1);
+      anim.scale.x = Math.abs(anim.scale.x || 1); // Actualizar la última dirección para W y S
 
-      // Actualizar la última dirección para W y S
       if (currentAnimKey === "walk1") lastDirectionKey = "idle2";
-      if (currentAnimKey === "walk3") lastDirectionKey = "idle3";
+      if (currentAnimKey === "walk3") lastDirectionKey = "idle3"; // Para walk1 y walk3, restablecemos la escala X de reposo a 1
 
-      // Para walk1 y walk3, restablecemos la escala X de reposo a 1
       lastScaleX = Math.abs(lastScaleX);
     }
 
@@ -330,9 +319,8 @@ function gameloop() {
   } else {
     // Animacion de idle
     hideAllAnims();
-    let idleKey = lastDirectionKey;
+    let idleKey = lastDirectionKey; // Si la última dirección de caminata fue "idle1" (izquierda), usamos el sprite "idle4"
 
-    // Si la última dirección de caminata fue "idle1" (izquierda), usamos el sprite "idle4"
     if (idleKey === "idle1") {
       idleKey = "idle4";
     }
@@ -343,9 +331,8 @@ function gameloop() {
       // Si la animación idle existe, la mostramos y sincronizamos
       idleAnim.x = characterPos.x;
       idleAnim.y = characterPos.y;
-      idleAnim.visible = true;
+      idleAnim.visible = true; // Aplicar la escala horizontal guardada (solo para idle4)
 
-      // Aplicar la escala horizontal guardada (solo para idle4)
       if (idleKey === "idle4") {
         idleAnim.scale.x = lastScaleX;
       } else {
@@ -361,11 +348,7 @@ function gameloop() {
       granjera.y = characterPos.y;
       granjera.visible = true;
     }
-  }
-
-  // 4. --- LÓGICA DE INTERACCIÓN Y MATANZA (Movida a performKillLogic) ---
-  // Esta sección se ha movido a una función separada para ser llamada
-  // cuando se inicia el ataque, en lugar de cada frame.
+  } // 4. --- LÓGICA DE INTERACCIÓN Y MATANZA (Movida a performKillLogic) --- // Esta sección se ha movido a una función separada para ser llamada // cuando se inicia el ataque, en lugar de cada frame.
 }
 
 // ===============================================
@@ -373,25 +356,20 @@ function gameloop() {
 // ===============================================
 
 function performKillLogic() {
-  if (typeof flock === "undefined") return;
+  if (typeof flock === "undefined") return; // Obtenemos la posición real de la granjera
 
-  // Obtenemos la posición real de la granjera
   const granjeraX = characterPos.x;
-  const granjeraY = characterPos.y;
+  const granjeraY = characterPos.y; // Iteramos el array 'flock' hacia atrás para poder eliminar elementos de forma segura
 
-  // Iteramos el array 'flock' hacia atrás para poder eliminar elementos de forma segura
   for (let i = flock.length - 1; i >= 0; i--) {
-    const animal = flock[i];
+    const animal = flock[i]; // Si el animal no es válido o ya fue eliminado, saltamos
 
-    // Si el animal no es válido o ya fue eliminado, saltamos
-    if (!animal || !animal.sprite) continue;
+    if (!animal || !animal.sprite) continue; // Calcular la distancia
 
-    // Calcular la distancia
     const dx = animal.sprite.x - granjeraX;
     const dy = animal.sprite.y - granjeraY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distance = Math.sqrt(dx * dx + dy * dy); // Condición de Muerte/Interacción
 
-    // Condición de Muerte/Interacción
     if (distance < KILL_RADIUS) {
       // Llamamos al método de eliminación que debe estar en la clase GoatBoid
       if (typeof animal.removeSelf === "function") {
@@ -402,9 +380,38 @@ function performKillLogic() {
         animal.sprite.visible = false;
         flock.splice(i, 1);
       }
-
+      // Marcamos que matamos una blanca para provocar la transformación
+      var killedWhite = true;
       // Si la granjera solo puede matar un animal por pulsación de tecla, salimos:
+      // (Esto asegura que el ataque solo elimine uno por golpe)
       break;
+    }
+  }
+
+  // Si no matamos ninguna del flock, intentamos con las ovejas estáticas (staticSheep)
+  if (typeof staticSheep !== "undefined") {
+    for (let i = staticSheep.length - 1; i >= 0; i--) {
+      const animal = staticSheep[i];
+      if (!animal || !animal.sprite) continue;
+      const dx = animal.sprite.x - granjeraX;
+      const dy = animal.sprite.y - granjeraY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < KILL_RADIUS) {
+        if (typeof animal.removeSelf === "function") {
+          animal.removeSelf();
+        } else {
+          animal.sprite.visible = false;
+          staticSheep.splice(i, 1);
+        }
+        break;
+      }
+    }
+  }
+
+  // Si matamos una blanca, transformamos otra blanca en negra
+  if (typeof killedWhite !== "undefined" && killedWhite) {
+    if (typeof transformRandomWhiteToBlack === "function") {
+      transformRandomWhiteToBlack();
     }
   }
 }
