@@ -2,6 +2,7 @@
 const numGoats = 80;
 const flock = [];
 const loadedTextures = {}; // Almacena los frames de animación cargados
+console.log("ovejas.js cargado. numGoats=", numGoats);
 
 // Definiciones de las rutas
 const SHEETS = ["goat_beige_w", "goat_beige_a", "goat_beige_s", "goat_beige_d"];
@@ -19,6 +20,8 @@ const BLACK_BASE = "animaciones_animales/goat_black/";
 // Array para ovejas negras estáticas (objetos con { sprite, removeSelf })
 const staticSheep = [];
 
+// HUD ahora está centralizado en js/contadores.js: usamos su API si existe
+
 // =========================================================
 // **  1. CLASE GOATBOID (Boid con Animación Direccional) **
 // =========================================================
@@ -33,13 +36,15 @@ class GoatBoid {
     this.sprite.animationSpeed = 0.15;
     this.sprite.play();
     // app debe estar definido y accesible globalmente
-    app.stage.addChild(this.sprite);
+    if (typeof world !== "undefined") world.addChild(this.sprite);
+    else app.stage.addChild(this.sprite);
 
     // Variables Boid
     this.position = new PIXI.Point(x, y);
     // Inicializamos la velocidad con dirección aleatoria y magnitud aleatoria
     // (evita dividir por cero si el vector casual queda en 0)
-    this.maxSpeed = 1.8;
+    // Velocidad moderada: suficiente para moverse pero no demasiado rápida
+    this.maxSpeed = 1.4;
     const ang = Math.random() * Math.PI * 2;
     const sp = Math.random() * this.maxSpeed;
     this.velocity = new PIXI.Point(Math.cos(ang) * sp, Math.sin(ang) * sp);
@@ -47,15 +52,15 @@ class GoatBoid {
     this.perceptionRadius = 60;
     this.separationDistance = 25;
     // Parámetros para evitar a la granjera (farmer)
-    this.avoidRadius = 90; // radio en píxeles en el que la cabra empezará a alejarse
-    this.avoidForce = 3.2; // multiplicador de fuerza de evasión (se normaliza por maxForce en applyForce)
-    this.minFarmerDistance = 32; // distancia mínima permitida entre la cabra y la granjera (teleport si la tocan)
+    this.avoidRadius = 120; // radio en píxeles en el que la cabra empezará a alejarse
+    this.avoidForce = 1.8; // fuerza base de evasión; aumentada para respuesta más perceptible
+    this.minFarmerDistance = 48; // distancia de seguridad alrededor de la granjera
     // Wander (deambular) para evitar que todas vayan en la misma dirección
     this.wanderAngle = Math.random() * Math.PI * 2;
-    this.wanderRadius = 8; // radio del círculo de wander
-    this.wanderDistance = 12; // distancia del círculo desde la posición
-    this.wanderChange = 0.6; // cuánto puede cambiar el ángulo por frame
-    this.wanderStrength = 0.3; // fuerza de steering del wander
+    this.wanderRadius = 6; // radio del círculo de wander
+    this.wanderDistance = 10; // distancia del círculo desde la posición
+    this.wanderChange = 0.4; // cuánto puede cambiar el ángulo por frame
+    this.wanderStrength = 0.15; // fuerza de steering del wander (menor para movimiento más lento)
 
     // No normalizamos aquí porque ya inicializamos con magnitud <= maxSpeed
   }
@@ -64,49 +69,48 @@ class GoatBoid {
   avoidFarmer() {
     // Si la granjera no está definida, no hacemos nada
     if (typeof characterPos === "undefined") return new PIXI.Point(0, 0);
-
     const dx = this.position.x - characterPos.x;
     const dy = this.position.y - characterPos.y;
     const d = Math.sqrt(dx * dx + dy * dy);
 
+    // Caso degenerado: aplicamos una pequeña fuerza aleatoria para salir
     if (d === 0) {
-      // Caso degenerado: reposicionar a un punto mínimo alrededor de la granjera
       const ux = Math.random() - 0.5 || 0.1;
       const uy = Math.random() - 0.5 || 0.1;
-      const len = Math.sqrt(ux * ux + uy * uy);
-      const nx = (ux / len) * this.minFarmerDistance;
-      const ny = (uy / len) * this.minFarmerDistance;
-      this.position.x = characterPos.x + nx;
-      this.position.y = characterPos.y + ny;
-      this.sprite.x = this.position.x;
-      this.sprite.y = this.position.y;
-      this.velocity.x = (nx / this.minFarmerDistance) * this.maxSpeed;
-      this.velocity.y = (ny / this.minFarmerDistance) * this.maxSpeed;
-      return new PIXI.Point(0, 0);
+      const len = Math.sqrt(ux * ux + uy * uy) || 1;
+      const nx = ux / len;
+      const ny = uy / len;
+      return new PIXI.Point(nx * this.avoidForce, ny * this.avoidForce);
     }
 
-    // Si estamos dentro de la distancia mínima, forzamos una recolocación al borde
+    // Si estamos muy cerca, aplicamos una fuerza más fuerte y reducimos velocidad
     if (d < this.minFarmerDistance) {
       const ux = dx / d;
       const uy = dy / d;
-      this.position.x = characterPos.x + ux * this.minFarmerDistance;
-      this.position.y = characterPos.y + uy * this.minFarmerDistance;
-      this.sprite.x = this.position.x;
-      this.sprite.y = this.position.y;
-      // Rebotar la velocidad hacia afuera
-      this.velocity.x = ux * this.maxSpeed;
-      this.velocity.y = uy * this.maxSpeed;
-      return new PIXI.Point(0, 0);
+      const strength =
+        ((this.minFarmerDistance - d) / this.minFarmerDistance) *
+        this.avoidForce *
+        1.6;
+      const n1 = (Math.random() - 0.5) * 0.9;
+      const n2 = (Math.random() - 0.5) * 0.9;
+      this.velocity.x *= 0.75;
+      this.velocity.y *= 0.75;
+      const fx = ux * strength + n1 * (strength * 0.4);
+      const fy = uy * strength + n2 * (strength * 0.4);
+      return new PIXI.Point(fx, fy);
     }
 
+    // Dentro del radio de evasión: fuerza gradual con ruido leve
     if (d < this.avoidRadius) {
-      // Vector unitario en dirección contraria a la granjera
       const ux = dx / d;
       const uy = dy / d;
-      // Fuerza proporcional a qué tan cerca estemos (más fuerte cuanto más cerca)
       const strength =
         ((this.avoidRadius - d) / this.avoidRadius) * this.avoidForce;
-      return new PIXI.Point(ux * strength, uy * strength);
+      const n1 = (Math.random() - 0.5) * 0.4;
+      const n2 = (Math.random() - 0.5) * 0.4;
+      const fx = ux * strength + n1 * (strength * 0.25);
+      const fy = uy * strength + n2 * (strength * 0.25);
+      return new PIXI.Point(fx, fy);
     }
 
     return new PIXI.Point(0, 0);
@@ -115,7 +119,6 @@ class GoatBoid {
   updateAnimation() {
     const angle = Math.atan2(this.velocity.y, this.velocity.x);
     const degrees = angle * (180 / Math.PI);
-
     let newAnimKey;
     if (degrees >= -45 && degrees < 45) {
       newAnimKey = "goat_beige_d";
@@ -136,35 +139,6 @@ class GoatBoid {
     }
   }
 
-  // Reglas Boid (flock, applyForce, update, edges, separate, align, cohesion) - Se mantienen.
-  flock(flock) {
-    // Reglas boid
-    let sep = this.separate(flock);
-    let ali = this.align(flock);
-    let coh = this.cohesion(flock);
-    // Evasión de la granjera: fuerza adicional que empuja en sentido contrario
-    let evade = this.avoidFarmer(flock);
-    // Wander para diversidad
-    let wander = this.wander();
-
-    // Pesos: reducimos el alineamiento para evitar que todos vayan juntos a la misma dirección
-    sep.x *= 1.8;
-    sep.y *= 1.8;
-    ali.x *= 0.6;
-    ali.y *= 0.6; // menos alineamiento
-    coh.x *= 0.8;
-    coh.y *= 0.8;
-    wander.x *= 1.0;
-    wander.y *= 1.0;
-
-    // Aplicar las fuerzas. Evitar se aplica al final para mayor prioridad.
-    this.applyForce(sep);
-    this.applyForce(coh);
-    this.applyForce(ali);
-    this.applyForce(wander);
-    this.applyForce(evade);
-  }
-
   // Wander: comportamiento de deriva aleatoria para diversificar direcciones
   wander() {
     // cambiar ligeramente el ángulo
@@ -183,10 +157,17 @@ class GoatBoid {
   }
 
   applyForce(force) {
+    // Compatibilidad: aceptar override opcional para maxForce (prioridad de la fuerza)
+    // Si se pasa un objeto en vez de punto, tratamos como (force, maxOverride)
+    let maxOverride = null;
+    if (arguments.length > 1 && typeof arguments[1] === "number")
+      maxOverride = arguments[1];
+
     let mag = Math.sqrt(force.x * force.x + force.y * force.y);
-    if (mag > this.maxForce) {
-      force.x *= this.maxForce / mag;
-      force.y *= this.maxForce / mag;
+    const clamp = maxOverride || this.maxForce;
+    if (mag > clamp) {
+      force.x *= clamp / mag;
+      force.y *= clamp / mag;
     }
     this.velocity.x += force.x;
     this.velocity.y += force.y;
@@ -201,8 +182,9 @@ class GoatBoid {
 
   update() {
     // Añadimos un pequeño ruido aleatorio para evitar que todos tomen la misma trayectoria
-    this.velocity.x += (Math.random() - 0.5) * 0.04;
-    this.velocity.y += (Math.random() - 0.5) * 0.04;
+    // Magnitud reducida para movimiento más lento
+    this.velocity.x += (Math.random() - 0.5) * 0.02;
+    this.velocity.y += (Math.random() - 0.5) * 0.02;
     // Limitar magnitud de velocidad
     let velMagClamp = Math.sqrt(
       this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y
@@ -221,12 +203,27 @@ class GoatBoid {
   }
 
   edges() {
-    const screenWidth = app.screen.width;
-    const screenHeight = app.screen.height;
-    if (this.position.x > screenWidth) this.position.x = 0;
-    else if (this.position.x < 0) this.position.x = screenWidth;
-    if (this.position.y > screenHeight) this.position.y = 0;
-    else if (this.position.y < 0) this.position.y = screenHeight;
+    // Clamp dentro del mundo/ventana para evitar que salgan
+    const screenWidth =
+      typeof WORLD_WIDTH !== "undefined" ? WORLD_WIDTH : app.screen.width;
+    const screenHeight =
+      typeof WORLD_HEIGHT !== "undefined" ? WORLD_HEIGHT : app.screen.height;
+    const halfW = Math.max(this.sprite.width, 16) * 0.5;
+    const halfH = Math.max(this.sprite.height, 16) * 0.5;
+    if (this.position.x > screenWidth - halfW) {
+      this.position.x = screenWidth - halfW;
+      this.velocity.x *= -0.3; // rebotec suave
+    } else if (this.position.x < halfW) {
+      this.position.x = halfW;
+      this.velocity.x *= -0.3;
+    }
+    if (this.position.y > screenHeight - halfH) {
+      this.position.y = screenHeight - halfH;
+      this.velocity.y *= -0.3;
+    } else if (this.position.y < halfH) {
+      this.position.y = halfH;
+      this.velocity.y *= -0.3;
+    }
   }
 
   separate(flock) {
@@ -242,8 +239,10 @@ class GoatBoid {
           this.position.x - other.position.x,
           this.position.y - other.position.y
         );
-        diff.x /= d * d;
-        diff.y /= d * d;
+        // atenuar por distancia (1/d) en lugar de 1/d^2 para evitar fuerzas explosivas
+        const inv = 1 / (d || 0.0001);
+        diff.x *= inv;
+        diff.y *= inv;
         steering.x += diff.x;
         steering.y += diff.y;
         count++;
@@ -288,14 +287,57 @@ class GoatBoid {
         centerOfMass.y += other.position.y;
         count++;
       }
-      if (count > 0) {
-        centerOfMass.x /= count;
-        centerOfMass.y /= count;
-        centerOfMass.x -= this.position.x;
-        centerOfMass.y -= this.position.y;
-      }
+    }
+    if (count > 0) {
+      centerOfMass.x /= count;
+      centerOfMass.y /= count;
+      centerOfMass.x -= this.position.x;
+      centerOfMass.y -= this.position.y;
     }
     return centerOfMass;
+  }
+
+  // Comportamiento de flock: combina separación, alineamiento, cohesión, wander y evasión
+  flock(flockArray) {
+    // Obtener vectores básicos
+    const sep = this.separate(flockArray);
+    const ali = this.align(flockArray);
+    const coh = this.cohesion(flockArray);
+    const wand = this.wander();
+
+    // Pesos (tuneables)
+    // Ajustes para dispersión: incrementar separación y wander, reducir alineamiento y cohesión
+    const SEP_W = 2.2;
+    const ALI_W = 0.15;
+    const COH_W = 0.12;
+    const WAND_W = 1.2;
+
+    // Escalamos los componentes
+    sep.x *= SEP_W;
+    sep.y *= SEP_W;
+    ali.x *= ALI_W;
+    ali.y *= ALI_W;
+    coh.x *= COH_W;
+    coh.y *= COH_W;
+    wand.x *= WAND_W;
+    wand.y *= WAND_W;
+
+    // Aplicamos fuerzas normales
+    this.applyForce(sep);
+    this.applyForce(ali);
+    this.applyForce(coh);
+    this.applyForce(wand);
+
+    // Evasión de la granjera: si existe una fuerza de evasión, aplicarla con prioridad
+    const evade = this.avoidFarmer();
+    if (
+      (evade.x && Math.abs(evade.x) > 0.0001) ||
+      (evade.y && Math.abs(evade.y) > 0.0001)
+    ) {
+      // Aplicar evasión con un clamp mayor para que no sea anulada por otras fuerzas
+      const overrideClamp = this.maxForce * 6;
+      this.applyForce(evade, overrideClamp);
+    }
   }
 
   // Remueve la cabra de la escena y del arreglo global `flock` (llamado por granjera.performKillLogic)
@@ -319,8 +361,14 @@ class GoatBoid {
 
 function createFlock() {
   for (let i = 0; i < numGoats; i++) {
-    const startX = Math.random() * app.screen.width;
-    const startY = Math.random() * app.screen.height;
+    const startX =
+      typeof WORLD_WIDTH !== "undefined"
+        ? Math.random() * WORLD_WIDTH
+        : Math.random() * app.screen.width;
+    const startY =
+      typeof WORLD_HEIGHT !== "undefined"
+        ? Math.random() * WORLD_HEIGHT
+        : Math.random() * app.screen.height;
     const goat = new GoatBoid(startX, startY);
     flock.push(goat);
   }
@@ -329,13 +377,93 @@ function createFlock() {
 }
 
 function goatGameloop() {
-  for (let goat of flock) {
-    goat.flock(flock);
-    goat.update();
+  // Usamos un bucle hacia atrás para poder eliminar entradas inválidas sin romper la iteración
+  for (let i = flock.length - 1; i >= 0; i--) {
+    const goat = flock[i];
+    if (!goat) {
+      flock.splice(i, 1);
+      continue;
+    }
+    try {
+      // Intentamos ejecutar las funciones; si no existen o fallan lanzará y lo atrapamos
+      if (goat && typeof goat.flock === "function") goat.flock(flock);
+      if (goat && typeof goat.update === "function") goat.update();
+      // Resolver colisiones contra obstáculos (si existen)
+      try {
+        if (typeof ObstacleManager !== "undefined") {
+          const radius =
+            Math.max(goat.sprite.width, goat.sprite.height) * 0.5 * 0.6;
+          ObstacleManager.resolvePoint(goat.position, radius);
+          goat.sprite.x = goat.position.x;
+          goat.sprite.y = goat.position.y;
+        }
+      } catch (e) {
+        // no bloquear si no está disponible
+      }
+    } catch (e) {
+      console.error(
+        "Error actualizando goat en goatGameloop, se eliminará el elemento:",
+        e,
+        goat
+      );
+      flock.splice(i, 1);
+    }
   }
   // Actualizar ovejas negras móviles
   for (let s of staticSheep) {
     if (s && typeof s.update === "function") s.update();
+  }
+
+  // Corrección física simple: evitar solapamiento entre ovejas del flock
+  for (let i = 0; i < flock.length; i++) {
+    for (let j = i + 1; j < flock.length; j++) {
+      const a = flock[i];
+      const b = flock[j];
+      if (!a || !b) continue;
+      const dx = b.position.x - a.position.x;
+      const dy = b.position.y - a.position.y;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+      // Determinar radios aproximados (basado en ancho del sprite)
+      const ra = Math.max(a.sprite.width, a.sprite.height) * 0.5 * 0.8;
+      const rb = Math.max(b.sprite.width, b.sprite.height) * 0.5 * 0.8;
+      const minDist = ra + rb;
+      if (dist < minDist && dist > 0) {
+        const overlap = (minDist - dist) / 2;
+        const ux = dx / dist;
+        const uy = dy / dist;
+        // mover ambos hacia fuera
+        a.position.x -= ux * overlap;
+        a.position.y -= uy * overlap;
+        b.position.x += ux * overlap;
+        b.position.y += uy * overlap;
+        a.sprite.x = a.position.x;
+        a.sprite.y = a.position.y;
+        b.sprite.x = b.position.x;
+        b.sprite.y = b.position.y;
+      }
+    }
+  }
+
+  // Evitar solapamiento entre flock y staticSheep
+  for (let g of flock) {
+    for (let s of staticSheep) {
+      if (!g || !s) continue;
+      const dx = g.position.x - s.sprite.x;
+      const dy = g.position.y - s.sprite.y;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+      const rg = Math.max(g.sprite.width, g.sprite.height) * 0.5 * 0.8;
+      const rs = Math.max(s.sprite.width, s.sprite.height) * 0.5 * 0.8;
+      const minD = rg + rs;
+      if (dist < minD) {
+        const overlap = minD - dist + 0.5;
+        const ux = dx / dist;
+        const uy = dy / dist;
+        g.position.x += ux * overlap;
+        g.position.y += uy * overlap;
+        g.sprite.x = g.position.x;
+        g.sprite.y = g.position.y;
+      }
+    }
   }
 }
 
@@ -456,6 +584,10 @@ async function loadGoatAssets() {
       createFlock();
       // Crear 6 ovejas negras móviles en posiciones aleatorias
       createStaticBlackSheep(6);
+      // Actualizar HUD después de crear entidades
+      if (typeof window.updateCounters === "function") {
+        window.updateCounters(flock.length, staticSheep.length);
+      }
       console.log(
         "¡Éxito! 🎉 La simulación Boid con cabras animadas ha comenzado."
       );
@@ -469,7 +601,6 @@ async function loadGoatAssets() {
   }
 }
 
-// ⚠️ EJECUCIÓN ⚠️
 // ⚠️ EJECUCIÓN ⚠️
 loadGoatAssets();
 
@@ -486,8 +617,14 @@ function createStaticBlackSheep(count = 6) {
   }
 
   for (let i = 0; i < count; i++) {
-    let x = Math.random() * app.screen.width;
-    let y = Math.random() * app.screen.height;
+    let x =
+      typeof WORLD_WIDTH !== "undefined"
+        ? Math.random() * WORLD_WIDTH
+        : Math.random() * app.screen.width;
+    let y =
+      typeof WORLD_HEIGHT !== "undefined"
+        ? Math.random() * WORLD_HEIGHT
+        : Math.random() * app.screen.height;
 
     // Asegurar que no nazcan encima de la granjera: si characterPos existe, reposicionar
     if (typeof characterPos !== "undefined") {
@@ -514,16 +651,17 @@ function createMovingBlackSheep(x, y) {
   sprite.anchor.set(0.5);
   sprite.x = x;
   sprite.y = y;
-  sprite.animationSpeed = 0.12;
+  sprite.animationSpeed = 0.08; // más lento
   sprite.play();
-  app.stage.addChild(sprite);
+  if (typeof world !== "undefined") world.addChild(sprite);
+  else app.stage.addChild(sprite);
 
   // Parámetros de movimiento circular y errático
   const center = { x: x, y: y };
   let angle = Math.random() * Math.PI * 2;
-  const radius = 6 + Math.random() * 10; // pequeño radio
+  const radius = 4 + Math.random() * 6; // radio aún más pequeño
   let angularSpeed =
-    (Math.random() * 0.06 + 0.02) * (Math.random() < 0.5 ? -1 : 1);
+    (Math.random() * 0.02 + 0.008) * (Math.random() < 0.5 ? -1 : 1); // más lento
 
   const obj = {
     sprite,
@@ -533,17 +671,58 @@ function createMovingBlackSheep(x, y) {
     angularSpeed,
     // update llamado desde goatGameloop
     update() {
-      // variar ligeramente el centro para dar comportamiento errático
-      center.x += (Math.random() - 0.5) * 0.6;
-      center.y += (Math.random() - 0.5) * 0.6;
-      // alterar la velocidad angular levemente
-      this.angularSpeed += (Math.random() - 0.5) * 0.004;
+      // Si la granjera está cerca, empujar el centro hacia afuera de forma gradual
+      if (typeof characterPos !== "undefined") {
+        const dx = center.x - characterPos.x;
+        const dy = center.y - characterPos.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+        const avoidRadius = 120;
+        if (d < avoidRadius) {
+          const ux = dx / d;
+          const uy = dy / d;
+          const strength = ((avoidRadius - d) / avoidRadius) * 1.8; // magnitud de empuje
+          center.x += ux * strength * 1.2;
+          center.y += uy * strength * 1.2;
+        }
+      }
+
+      // variar ligeramente el centro para dar comportamiento errático (más suave)
+      center.x += (Math.random() - 0.5) * 0.2;
+      center.y += (Math.random() - 0.5) * 0.2;
+      // alterar la velocidad angular muy levemente
+      this.angularSpeed += (Math.random() - 0.5) * 0.001;
       // limitar angularSpeed
-      if (this.angularSpeed > 0.12) this.angularSpeed = 0.12;
-      if (this.angularSpeed < -0.12) this.angularSpeed = -0.12;
+      if (this.angularSpeed > 0.045) this.angularSpeed = 0.045;
+      if (this.angularSpeed < -0.045) this.angularSpeed = -0.045;
       this.angle += this.angularSpeed;
       this.sprite.x = center.x + Math.cos(this.angle) * this.radius;
       this.sprite.y = center.y + Math.sin(this.angle) * this.radius;
+      // Limitar dentro de la pantalla
+      const sw = app.screen.width;
+      const sh = app.screen.height;
+      // ajustar center si sprite colisiona contra bordes u obstáculos
+      if (typeof ObstacleManager !== "undefined") {
+        const p = { x: this.sprite.x, y: this.sprite.y };
+        try {
+          ObstacleManager.resolvePoint(
+            p,
+            Math.max(this.sprite.width, this.sprite.height) * 0.5 * 0.7
+          );
+          const dx = p.x - this.sprite.x;
+          const dy = p.y - this.sprite.y;
+          if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
+            center.x += dx;
+            center.y += dy;
+            this.sprite.x = p.x;
+            this.sprite.y = p.y;
+          }
+        } catch (e) {}
+      }
+      // clamp center to screen
+      if (center.x < 8) center.x = 8;
+      if (center.y < 8) center.y = 8;
+      if (center.x > sw - 8) center.x = sw - 8;
+      if (center.y > sh - 8) center.y = sh - 8;
     },
     removeSelf() {
       try {
@@ -575,6 +754,9 @@ function transformRandomWhiteToBlack() {
   else flock.splice(idx, 1);
   // crear una oveja negra móvil en su lugar
   createMovingBlackSheep(x, y);
+  // actualizar HUD si existe
+  if (typeof window.updateCounters === "function")
+    window.updateCounters(flock.length, staticSheep.length);
 
   // Comprueba condición de reinicio: si hay más de la mitad convertidas a negras
   const blackCount = staticSheep.length;

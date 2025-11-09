@@ -1,8 +1,17 @@
 // Posición central del personaje: Esta es la "verdad" de la posición.
+// Inicializar position defensivamente (si `app` aún no existe usamos viewport)
 let characterPos = {
-  x: app.screen.width / 2,
-  y: app.screen.height / 2,
+  x:
+    typeof app !== "undefined" && app.screen
+      ? app.screen.width / 2
+      : Math.round(window.innerWidth / 2),
+  y:
+    typeof app !== "undefined" && app.screen
+      ? app.screen.height / 2
+      : Math.round(window.innerHeight / 2),
 };
+
+console.log("granjera.js cargado. characterPos:", characterPos);
 
 // variable de estado: Para recordar la última dirección de caminata (Abajo por defecto).
 let lastDirectionKey = "idle3";
@@ -19,7 +28,9 @@ const granjera = PIXI.Sprite.from("images/granjera.png");
 granjera.anchor.set(0.5);
 granjera.x = characterPos.x;
 granjera.y = characterPos.y;
-app.stage.addChild(granjera);
+// Añadimos la granjera al contenedor del mundo si existe, sino al stage
+if (typeof world !== "undefined") world.addChild(granjera);
+else app.stage.addChild(granjera);
 
 // Variables y referencias
 let keys = {};
@@ -28,6 +39,7 @@ const animSprites = {}; // Para guardar las animaciones
 // ** NUEVOS PARÁMETROS DE INTERACCIÓN **
 const KILL_KEY_CODE = 32; // Código de tecla para matar (32 es la barra espaciadora)
 const KILL_RADIUS = 40; // Distancia máxima en píxeles para que la granjera pueda interactuar/matar
+const FARMER_RADIUS = 24; // Radio aproximado para evitar obstaculos
 
 // ===========================================
 // *** FUNCIONES HELPERS ***
@@ -108,7 +120,8 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
 
     animSprite.visible = false;
     animSprite.scale.x = Math.abs(animSprite.scale.x || 1);
-    app.stage.addChild(animSprite);
+    if (typeof world !== "undefined") world.addChild(animSprite);
+    else app.stage.addChild(animSprite);
     if (keyName) animSprites[keyName] = animSprite; // Lógica para devolver al estado IDLE después de un ataque
 
     if (keyName.startsWith("attack")) {
@@ -192,6 +205,12 @@ window.addEventListener("keydown", keysDown);
 window.addEventListener("keyup", keysUp);
 
 function keysDown(e) {
+  // Evitar que la barra espaciadora haga scroll en la página
+  if (e.keyCode === KILL_KEY_CODE) {
+    try {
+      e.preventDefault();
+    } catch (err) {}
+  }
   keys[e.keyCode] = true;
 }
 function keysUp(e) {
@@ -216,7 +235,7 @@ function getAttackAnimKey() {
 // Gameloop para el movimiento, animación y la INTERACCIÓN DE MATANZA
 function gameloop() {
   let moving = false;
-  const speed = 4;
+  const speed = 3;
   let currentAnimKey = null;
 
   let movedX = false;
@@ -282,6 +301,55 @@ function gameloop() {
   }
 
   moving = movedX || movedY; // 3. --- LÓGICA DE ANIMACIÓN (Caminata/Idle) ---
+
+  // Resolver colisiones contra obstáculos para que la granjera no atraviese rocas
+  try {
+    if (typeof ObstacleManager !== "undefined") {
+      ObstacleManager.resolvePoint(characterPos, FARMER_RADIUS);
+    }
+  } catch (e) {
+    // no bloquear si no existe
+  }
+  // Clamp de la granjera dentro de la pantalla
+  try {
+    if (typeof app !== "undefined" && app.screen) {
+      const halfW = 18;
+      const halfH = 24;
+      const maxX =
+        typeof WORLD_WIDTH !== "undefined"
+          ? WORLD_WIDTH - halfW
+          : app.screen.width - halfW;
+      const maxY =
+        typeof WORLD_HEIGHT !== "undefined"
+          ? WORLD_HEIGHT - halfH
+          : app.screen.height - halfH;
+      if (characterPos.x < halfW) characterPos.x = halfW;
+      if (characterPos.y < halfH) characterPos.y = halfH;
+      if (characterPos.x > maxX) characterPos.x = maxX;
+      if (characterPos.y > maxY) characterPos.y = maxY;
+    }
+  } catch (e) {}
+
+  // Camara: centrar el world en la granjera, con límites para no mostrar fuera del mundo
+  try {
+    if (typeof world !== "undefined") {
+      const sw = app.screen.width;
+      const sh = app.screen.height;
+      const ww = typeof WORLD_WIDTH !== "undefined" ? WORLD_WIDTH : sw;
+      const wh = typeof WORLD_HEIGHT !== "undefined" ? WORLD_HEIGHT : sh;
+      let targetX = -characterPos.x + sw / 2;
+      let targetY = -characterPos.y + sh / 2;
+      // limitar para que no muestre fuera del mundo
+      const minX = -ww + sw;
+      const minY = -wh + sh;
+      if (targetX > 0) targetX = 0;
+      if (targetX < minX) targetX = minX;
+      if (targetY > 0) targetY = 0;
+      if (targetY < minY) targetY = minY;
+      world.x = targetX;
+      world.y = targetY;
+    }
+  } catch (e) {}
 
   if (moving && currentAnimKey && animSprites[currentAnimKey]) {
     // Animacion de walk
@@ -414,6 +482,18 @@ function performKillLogic() {
       transformRandomWhiteToBlack();
     }
   }
+  // Actualizar HUD si existe
+  try {
+    if (
+      typeof window !== "undefined" &&
+      typeof window.updateCounters === "function"
+    ) {
+      window.updateCounters(
+        Array.isArray(flock) ? flock.length : 0,
+        Array.isArray(staticSheep) ? staticSheep.length : 0
+      );
+    }
+  } catch (e) {}
 }
 
 // Se añade el gameloop al ticker

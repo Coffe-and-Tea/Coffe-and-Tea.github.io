@@ -7,35 +7,67 @@ const app = new PIXI.Application({
 });
 
 document.body.appendChild(app.view);
-// Agregamos el fondo a la escena
+// Configuramos tamaño del mundo (doble del viewport)
+const WORLD_WIDTH = app.screen.width * 2;
+const WORLD_HEIGHT = app.screen.height * 2;
+
+// Creamos un contenedor para todo el mundo (la "escena") y otro para HUD en pantalla fija
+const world = new PIXI.Container();
+const hudContainer = new PIXI.Container();
+app.stage.addChild(world);
+app.stage.addChild(hudContainer);
+
+// Agregamos el fondo al mundo y lo escalamos al tamaño del mundo
 const background = PIXI.Sprite.from("images/pasto.png");
-background.width = app.screen.width;
-background.height = app.screen.height;
+background.width = WORLD_WIDTH;
+background.height = WORLD_HEIGHT;
 background.anchor.set(0);
 background.x = 0;
 background.y = 0;
-app.stage.addChild(background);
+world.addChild(background);
 
-// Agregamos una granja a la escena
+// Agregamos una granja al mundo
 const farm = PIXI.Sprite.from("images/granja_abandonada.png");
 farm.width = 600;
 farm.height = 320;
-farm.anchor.set(0);
-(farm.x = app.screen.width / 2),
-  (farm.y = app.screen.height / 2),
-  app.stage.addChild(farm);
-background.x = 0;
-background.y = 0;
+farm.anchor.set(0.5);
+farm.x = WORLD_WIDTH / 2;
+farm.y = WORLD_HEIGHT / 2;
+world.addChild(farm);
 
-const piedra = PIXI.Sprite.from("images/piedra.png");
-piedra.width = 100;
-piedra.height = 70;
-app.stage.addChild(piedra);
+// Nota: placeholder 'piedra' removido; se crearán varias rocas más abajo
+// Crear 3 rocas distribuidas por el mapa y registrarlas como obstáculos
+const piedras = [];
+const rockPositions = [
+  { x: WORLD_WIDTH * 0.25, y: WORLD_HEIGHT * 0.6 },
+  { x: WORLD_WIDTH * 0.6, y: WORLD_HEIGHT * 0.35 },
+  { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.75 },
+];
 
+for (let i = 0; i < 3; i++) {
+  const r = PIXI.Sprite.from("images/piedra.png");
+  r.width = 90 + Math.random() * 40;
+  r.height = (r.width * 0.7) | 0;
+  r.anchor.set(0.5);
+  r.x = rockPositions[i].x + (Math.random() - 0.5) * 80;
+  r.y = rockPositions[i].y + (Math.random() - 0.5) * 60;
+  world.addChild(r);
+  piedras.push(r);
+}
+
+// Registrar las rocas como obstáculos en pendingObstacles para que ObstacleManager las añada
+window.pendingObstacles = window.pendingObstacles || [];
+for (let r of piedras) {
+  window.pendingObstacles.push({
+    sprite: r,
+    padding: 6,
+    options: { allowPassBehind: false },
+  });
+}
 
 // Iniciamos el temporizador cuando la ventana cargue
-window.addEventListener('load', () => {
-    if (window.gameTimer) {
-        window.gameTimer.start();
-    }
+window.addEventListener("load", () => {
+  if (window.gameTimer) {
+    window.gameTimer.start();
+  }
 });
