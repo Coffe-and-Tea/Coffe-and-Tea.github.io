@@ -22,13 +22,8 @@ class GoatBoid {
     this.sprite.y = y;
     this.sprite.animationSpeed = 0.15;
     this.sprite.play();
-    // Agregar al contenedor de la cámara en lugar de app.stage
-    if (window.gameCamera) {
-        window.gameCamera.addToContainer(this.sprite);
-    } else {
-        console.error('El sistema de cámara no está inicializado');
-        app.stage.addChild(this.sprite);
-    }
+  // app debe estar definido y accesible globalmente
+  app.stage.addChild(this.sprite);
 
     // Variables Boid
     this.position = new PIXI.Point(x, y);
@@ -115,12 +110,12 @@ class GoatBoid {
   }
 
   edges() {
-    const worldWidth = app.screen.width * 2;  // Hacemos el mundo más grande que la pantalla
-    const worldHeight = app.screen.height * 2;
-    if (this.position.x > worldWidth) this.position.x = 0;
-    else if (this.position.x < 0) this.position.x = worldWidth;
-    if (this.position.y > worldHeight) this.position.y = 0;
-    else if (this.position.y < 0) this.position.y = worldHeight;
+    const screenWidth = app.screen.width;
+    const screenHeight = app.screen.height;
+    if (this.position.x > screenWidth) this.position.x = 0;
+    else if (this.position.x < 0) this.position.x = screenWidth;
+    if (this.position.y > screenHeight) this.position.y = 0;
+    else if (this.position.y < 0) this.position.y = screenHeight;
   }
 
   separate(flock) {
@@ -336,9 +331,5 @@ async function loadGoatAssets() {
 }
 
 // ⚠️ EJECUCIÓN ⚠️
-window.addEventListener('load', () => {
-    // Esperamos un pequeño momento para asegurarnos de que la cámara esté inicializada
-    setTimeout(() => {
-        loadGoatAssets();
-    }, 100);
-});
+// ⚠️ EJECUCIÓN ⚠️
+loadGoatAssets();

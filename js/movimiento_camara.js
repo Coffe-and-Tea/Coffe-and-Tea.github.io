@@ -18,8 +18,8 @@ function moverCamara(characterPos, appInstance) {
 
     // Aplicar suavizado al movimiento de la cámara 
     const lerp = 0.1; 
-    gameContainer.x += (targetX - gameContainer.x) * lerp;
-    gameContainer.y += (targetY - gameContainer.y) * lerp;
+    gameContainer.x = targetX;
+    gameContainer.y = targetY;
 }
 
 // Función para agregar elementos al contenedor del juego

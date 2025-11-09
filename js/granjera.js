@@ -13,20 +13,13 @@ let lastScaleX = 1;
 // NUEVA VARIABLE: Estado de ataque
 let isAttacking = false;
 
-// Creamos la granjera después de que todo esté cargado
-let granjera;
-window.addEventListener('load', () => {
-    // Agregamos un sprite estatico (usado como fallback si falla la carga o el idle)
-    granjera = PIXI.Sprite.from("images/granjera.png");
-    granjera.anchor.set(0.5);
-    granjera.x = characterPos.x;
-    granjera.y = characterPos.y;
-    if (window.gameCamera) {
-        window.gameCamera.addToContainer(granjera);
-    } else {
-        console.error('El sistema de cámara no está inicializado');
-    }
-});
+// Agregamos un sprite estatico (usado como fallback si falla la carga o el idle)
+// *** RUTA CORREGIDA: granjera.png está dentro de la carpeta 'images/' ***
+const granjera = PIXI.Sprite.from("images/granjera.png");
+granjera.anchor.set(0.5);
+granjera.x = characterPos.x;
+granjera.y = characterPos.y;
+app.stage.addChild(granjera);
 
 // Variables y referencias
 let keys = {};
@@ -116,14 +109,10 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
       animSprite.animationSpeed = 0.15; // Velocidad normal para caminar
     }
 
-    animSprite.visible = false;
-    animSprite.scale.x = Math.abs(animSprite.scale.x || 1);
-    if (window.gameCamera) {
-        window.gameCamera.addToContainer(animSprite);
-    } else {
-        console.error('El sistema de cámara no está inicializado');
-    }
-    if (keyName) animSprites[keyName] = animSprite;
+  animSprite.visible = false;
+  animSprite.scale.x = Math.abs(animSprite.scale.x || 1);
+  app.stage.addChild(animSprite);
+  if (keyName) animSprites[keyName] = animSprite;
 
     // Lógica para devolver al estado IDLE después de un ataque
     if (keyName.startsWith("attack")) {
@@ -421,11 +410,4 @@ function performKillLogic() {
 }
 
 // Se añade el gameloop al ticker
-  // Función del gameloop principal
-  function mainGameLoop() {
-    gameloop();
-    // Actualizar la posición de la cámara para seguir al personaje
-    window.gameCamera.move(characterPos, app);
-  }
-
-  if (app && app.ticker) app.ticker.add(mainGameLoop);
+if (app && app.ticker) app.ticker.add(gameloop);
