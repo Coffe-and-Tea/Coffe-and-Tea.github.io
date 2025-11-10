@@ -770,3 +770,49 @@ function transformRandomWhiteToBlack() {
     }
   }
 }
+
+// Convierte una fracción (0..1) del flock actual en ovejas negras.
+function convertFractionWhiteToBlack(fraction) {
+  if (!flock || flock.length === 0) return;
+  fraction = Math.max(0, Math.min(1, fraction || 0));
+  const totalWhite = flock.length;
+  const toConvert = Math.floor(totalWhite * fraction);
+  if (toConvert <= 0) return;
+
+  // Seleccionar 'toConvert' ovejas aleatorias sin repetir
+  const indices = Array.from({ length: totalWhite }, (_, i) => i);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = indices[i];
+    indices[i] = indices[j];
+    indices[j] = tmp;
+  }
+  const selected = indices.slice(0, toConvert).map((i) => flock[i]).filter(Boolean);
+
+  // Transformar cada cabra seleccionada en oveja negra móvil
+  for (let goat of selected) {
+    if (!goat) continue;
+    const x = goat.position.x;
+    const y = goat.position.y;
+    if (typeof goat.removeSelf === 'function') goat.removeSelf();
+    else {
+      const idx = flock.indexOf(goat);
+      if (idx !== -1) flock.splice(idx, 1);
+    }
+    createMovingBlackSheep(x, y);
+  }
+
+  // Actualizar HUD si existe
+  if (typeof window.updateCounters === 'function') window.updateCounters(flock.length, staticSheep.length);
+
+  // Comprobar condición de reinicio (misma lógica que en transformRandomWhiteToBlack)
+  const blackCount = staticSheep.length;
+  if (blackCount > numGoats / 2) {
+    if (typeof location !== 'undefined' && typeof location.reload === 'function') {
+      location.reload();
+    }
+  }
+}
+
+// Exponer la función globalmente para que otros scripts (p.ej. temporizador) puedan llamarla
+window.convertFractionWhiteToBlack = convertFractionWhiteToBlack;

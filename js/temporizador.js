@@ -1,4 +1,3 @@
-
 const tiempo_inicial = 40; // segundos iniciales
 let timeLeft = tiempo_inicial;
 let timerInterval = null;
@@ -40,6 +39,12 @@ function tick() {
         timerInterval = null;
         timerDiv.textContent = formatTime(0);
         timerDiv.classList.add('warning');
+        // Convertir un tercio de las ovejas blancas a negras una sola vez cuando finaliza el temporizador
+        if (!window.sheepConvertedByTimer && typeof window.convertFractionWhiteToBlack === 'function') {
+            window.sheepConvertedByTimer = true;
+            // convertir 1/3
+            window.convertFractionWhiteToBlack(1/3);
+        }
         return;
     }
     timeLeft--;
@@ -52,6 +57,8 @@ function startTimer() {
         clearInterval(timerInterval);
     }
     timeLeft = tiempo_inicial;
+    // permitir que la conversión ocurra de nuevo en futuros reinicios
+    window.sheepConvertedByTimer = false;
     updateDisplay();
     timerInterval = setInterval(tick, 1000);
 }
