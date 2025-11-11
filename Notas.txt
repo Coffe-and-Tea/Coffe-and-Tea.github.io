@@ -5,25 +5,29 @@ Cosas por terminar/ implementar:
         - Movimiento de la camara.         ✅
 
     Animales:
-        - Agregar animaciones basicas de movimiento
+        - Agregar animaciones basicas de movimiento       ✅
         - Implemenar mecanica de muerte
         - Implemenar movimiento boid (grupos)             ✅
-        - Implemenar movimiento pausado (encarnados)
+        - Implemenar movimiento pausado (encarnados)      ✅
 
     Obstaculos:
         - ballas (opcional)
         - fardos (opcional)
-        - rocas  (opcional)
-        - granja
+        - rocas  (opcional) ✅
+        - granja            ✅
 
     Hud:
-        - Agregar contador de animales sanos
-        - Agregar contador de animales infectados
-        - Agregar temporizador 
+        - Agregar contador de animales sanos      ✅
+        - Agregar contador de animales infectados ✅
+        - Agregar temporizador                    ✅
 
     Extras:
         - Menu 
-        - ReadMe git
+        - ReadMe gitgit 
+
+Modificaciones: 
+- Le agreque que se oscuresca la pantalla cuando el contador llega a 00, falta agregar 
+que la granjera se quede estatica y que salga un cartel de perdiste / reiniciar.
 
 
 Codigo util y funcional:
@@ -34,4 +38,3 @@ Codigo util y funcional:
             granjera.x = pointerPosition.x;
             granjera.y = pointerPosition.y;
         });
-        
