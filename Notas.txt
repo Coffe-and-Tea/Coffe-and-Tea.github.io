@@ -3,6 +3,7 @@ Cosas por terminar/ implementar:
         - Ordenar el codigo de granjera 
         - Agregar animaciones de ataque    ✅
         - Movimiento de la camara.         ✅
+        - Acomodar animacion (le falta el pocho y la sombra)
 
     Animales:
         - Agregar animaciones basicas de movimiento       ✅
@@ -21,13 +22,21 @@ Cosas por terminar/ implementar:
         - Agregar contador de animales infectados ✅
         - Agregar temporizador                    ✅
 
-    Extras:
-        - Menu 
-        - ReadMe gitgit 
+    Pantallas: 
+        - Inicio: - Agregar iamgen con tuto
+                  - Boton de comenzar
 
-Modificaciones: 
-- Le agreque que se oscuresca la pantalla cuando el contador llega a 00, falta agregar 
-que la granjera se quede estatica y que salga un cartel de perdiste / reiniciar.
+        - Final: - Que la granjera se quede quieta cuando se pone la pantalla en negro cuando pierde
+                 - Cuando gana que la pantalla se ponga en negro y salga un cartel de ganaste y jugar de nuevo
+
+    Extras:
+        - Menu botn pausa
+        - ReadMe gitgit 
+        - Arrglar botones (esteticamente hablando)
+
+
+
+
 
 
 Codigo util y funcional:
