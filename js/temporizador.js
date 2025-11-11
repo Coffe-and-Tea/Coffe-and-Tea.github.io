@@ -1,6 +1,6 @@
 // temporizador.js
 
-const tiempo_inicial = 20; // segundos iniciales
+const tiempo_inicial = 60; // segundos iniciales
 let timeLeft = tiempo_inicial;
 let timerInterval = null;
 
