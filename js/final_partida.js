@@ -60,7 +60,7 @@
     // Listen to the PIXI renderer resize event
     pixiApp.renderer.on('resize', updateOverlaySize);
     
-    // --- Lógica de la Interfaz de Game Over ---
+    // --- Lógica de la Interfaz de Game Over CORREGIDA ---
     
     function createGameOverUI() {
         if (gameOverContainer) return; // Already created
@@ -69,37 +69,53 @@
         gameOverContainer = new PIXI.Container();
         gameOverContainer.sortableChildren = true;
         
-        // 1. Título "PERDISTE"
-        const loseText = new PIXI.Text("PERDISTE", GAME_OVER_TEXT_STYLE);
-        // Aplica un fondo semi-transparente similar al CSS usando un Graphics detrás
+        // --- Estilos Comunes ---
+        const BACKGROUND_FILL_COLOR = 0xffffff; // Blanco
+        const BACKGROUND_FILL_ALPHA = 0.8;    // Opacidad
+        const ROUNDED_RECT_RADIUS = 10;       // Radio de las esquinas
+
+        // Estilo de texto para elementos sobre fondo BLANCO (Texto Negro, Borde Blanco)
+        const TEXT_STYLE_ON_WHITE_BG = Object.assign({}, GAME_OVER_TEXT_STYLE, { 
+            fill: 0x000000, // Color de texto NEGRO
+            stroke: 0xffffff, // Borde blanco
+            strokeThickness: 2, 
+            fontSize: 30
+        });
+
+        // 1. "PERDISTE" (Actúa como un botón, pero no es interactivo)
+        const loseText = new PIXI.Text("PERDISTE", TEXT_STYLE_ON_WHITE_BG);
+        loseText.anchor.set(0.5);
+
+        // Calcular tamaño del fondo de PERDISTE
+        const loseTextPadding = 5;
+        const loseTextBgWidth = loseText.width + 2 * loseTextPadding;
+        const loseTextBgHeight = loseText.height + loseTextPadding; 
+        
         const textBackground = new PIXI.Graphics();
-        textBackground.beginFill(0x000000, 0.5); // Negro con 50% de opacidad
-        // Añadimos padding y centramos el rectángulo detrás del texto
-        const padding = 15;
-        textBackground.drawRect(
-            -loseText.width / 2 - padding, 
-            -loseText.height / 2 - padding, 
-            loseText.width + 2 * padding, 
-            loseText.height + 2 * padding
+        textBackground.beginFill(BACKGROUND_FILL_COLOR, BACKGROUND_FILL_ALPHA);
+        textBackground.drawRoundedRect(
+            -loseTextBgWidth / 2, 
+            -loseTextBgHeight / 2, 
+            loseTextBgWidth, 
+            loseTextBgHeight, 
+            ROUNDED_RECT_RADIUS
         );
         textBackground.endFill();
-        // Centrar el texto
-        loseText.anchor.set(0.5);
-        loseText.y = -50; // Posición sobre el botón
         
-        // Agregamos el fondo y el texto al contenedor. El fondo va primero.
+        // Posicionamiento de PERDISTE (Texto + Fondo)
+        loseText.y = -50; 
+        textBackground.y = -50;
+
         gameOverContainer.addChild(textBackground);
         gameOverContainer.addChild(loseText);
 
-        // 2. Botón "REINICIAR" (Usando Graphics para la forma y Text para la etiqueta)
-        const BUTTON_STYLE = Object.assign({}, GAME_OVER_TEXT_STYLE, { 
-            fontSize: 24, 
-            fill: 0x000000, // Color de texto negro para el botón
-            stroke: 0xffffff, // Borde blanco
-            strokeThickness: 2
+        // 2. Botón "REINICIAR" 
+        // El estilo es el mismo, solo el tamaño de la fuente es menor
+        const RESTART_BUTTON_TEXT_STYLE = Object.assign({}, TEXT_STYLE_ON_WHITE_BG, {
+            fontSize: 24, // El botón es más pequeño
         });
-
-        const buttonText = new PIXI.Text("REINICIAR", BUTTON_STYLE);
+        
+        const buttonText = new PIXI.Text("REINICIAR", RESTART_BUTTON_TEXT_STYLE);
         buttonText.anchor.set(0.5);
 
         const button = new PIXI.Graphics();
@@ -107,9 +123,9 @@
         const buttonWidth = buttonText.width + 2 * buttonPadding;
         const buttonHeight = buttonText.height + buttonPadding;
         
-        // Dibujar el botón con un color de fondo diferente
-        button.beginFill(0xffffff, 0.8); // Fondo del botón blanco semi-transparente
-        button.drawRoundedRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, 10);
+        // Dibujar el botón (mismo estilo de fondo)
+        button.beginFill(BACKGROUND_FILL_COLOR, BACKGROUND_FILL_ALPHA); 
+        button.drawRoundedRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, ROUNDED_RECT_RADIUS);
         button.endFill();
         
         // Hacerlo interactivo
@@ -119,12 +135,10 @@
         // Listener para el click
         button.on('pointerdown', () => {
             console.log("[FADE CONTROLLER] Botón REINICIAR presionado. Recargando página...");
-            // *** MODIFICACIÓN AQUÍ ***
-            // Esto fuerza a que la página se cargue de nuevo.
             window.location.reload(); 
         });
 
-        // Posicionar y agregar al contenedor
+        // Posicionar el botón
         button.y = 50;
         buttonText.y = 50;
         gameOverContainer.addChild(button);
@@ -134,7 +148,7 @@
         gameOverContainer.x = pixiApp.renderer.width / 2;
         gameOverContainer.y = pixiApp.renderer.height / 2;
 
-        // Agregar el contenedor al Stage (DEBE ir DESPUÉS del overlay para estar encima)
+        // Agregar el contenedor al Stage
         pixiApp.stage.addChild(gameOverContainer);
         console.log("[FADE CONTROLLER] UI de Game Over creada y mostrada.");
     }
