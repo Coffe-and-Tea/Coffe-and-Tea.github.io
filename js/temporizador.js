@@ -1,4 +1,6 @@
-const tiempo_inicial = 40; // segundos iniciales
+// temporizador.js
+
+const tiempo_inicial = 20; // segundos iniciales
 let timeLeft = tiempo_inicial;
 let timerInterval = null;
 
@@ -39,6 +41,15 @@ function tick() {
         timerInterval = null;
         timerDiv.textContent = formatTime(0);
         timerDiv.classList.add('warning');
+        
+        // =========================================================
+        // AÑADIDO: INICIAR EL DESVANECIMIENTO DE LA PANTALLA
+        if (typeof window.startScreenFadeIn === 'function') {
+            window.startScreenFadeIn();
+            console.log("Temporizador finalizado. Iniciando desvanecimiento de pantalla.");
+        }
+        // =========================================================
+        
         // Convertir un tercio de las ovejas blancas a negras una sola vez cuando finaliza el temporizador
         if (!window.sheepConvertedByTimer && typeof window.convertFractionWhiteToBlack === 'function') {
             window.sheepConvertedByTimer = true;
