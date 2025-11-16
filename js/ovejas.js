@@ -1,5 +1,5 @@
 // Configuración global y referencias
-const numGoats = 80;
+const numGoats = 90;
 const flock = [];
 const loadedTextures = {}; // Almacena los frames de animación cargados
 console.log("ovejas.js cargado. numGoats=", numGoats);
@@ -322,7 +322,47 @@ class GoatBoid {
     return centerOfMass;
   }
 
-  // Comportamiento de flock: combina separación, alineamiento, cohesión, wander y evasión
+  // Atracción hacia ovejas negras (staticSheep)
+  attractToBlackSheep(blackSheepArray) {
+    let attraction = new PIXI.Point(0, 0);
+    if (!blackSheepArray || blackSheepArray.length === 0) {
+      return attraction;
+    }
+
+    const attractionRadius = 200; // radio en el que se sienten atraídas
+    let nearestBlack = null;
+    let nearestDist = Infinity;
+
+    // Encontrar la oveja negra más cercana dentro del radio
+    for (let blackSheep of blackSheepArray) {
+      if (!blackSheep || !blackSheep.position) continue;
+      const dx = blackSheep.position.x - this.position.x;
+      const dy = blackSheep.position.y - this.position.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+
+      if (d < attractionRadius && d < nearestDist) {
+        nearestDist = d;
+        nearestBlack = blackSheep;
+      }
+    }
+
+    // Si encontramos una oveja negra cercana, calcular fuerza de atracción
+    if (nearestBlack && nearestDist > 0) {
+      const dx = nearestBlack.position.x - this.position.x;
+      const dy = nearestBlack.position.y - this.position.y;
+      const d = nearestDist;
+
+      // Fuerza que aumenta cuando más cercana está la oveja negra
+      const strength = (1 - d / attractionRadius) * 0.8; // de 0.8 a 0
+
+      attraction.x = (dx / d) * strength;
+      attraction.y = (dy / d) * strength;
+    }
+
+    return attraction;
+  }
+
+  // Comportamiento de flock: combina separación, alineamiento, cohesión, wander, atracción a negras y evasión
   flock(flockArray) {
     // Obtener vectores básicos
     const sep = this.separate(flockArray);
@@ -330,12 +370,18 @@ class GoatBoid {
     const coh = this.cohesion(flockArray);
     const wand = this.wander();
 
+    // Obtener atracción hacia ovejas negras
+    const attract = this.attractToBlackSheep(
+      typeof window.staticSheep !== "undefined" ? window.staticSheep : []
+    );
+
     // Pesos (tuneables)
     // Ajustes para dispersión: incrementar separación y wander, reducir alineamiento y cohesión
     const SEP_W = 2.2;
     const ALI_W = 0.15;
     const COH_W = 0.12;
     const WAND_W = 1.2;
+    const ATTR_W = 1.5; // peso de atracción a ovejas negras
 
     // Escalamos los componentes
     sep.x *= SEP_W;
@@ -346,19 +392,29 @@ class GoatBoid {
     coh.y *= COH_W;
     wand.x *= WAND_W;
     wand.y *= WAND_W;
+    attract.x *= ATTR_W;
+    attract.y *= ATTR_W;
 
     // Aplicamos fuerzas normales
     this.applyForce(sep);
     this.applyForce(ali);
     this.applyForce(coh);
     this.applyForce(wand);
+    this.applyForce(attract); // Aplicar atracción a ovejas negras
 
     // Evasión de la granjera: si existe una fuerza de evasión, aplicarla con prioridad
+    // Pero si hay atracción a ovejas negras, reducir la fuerza de evasión para que les cueste más alejarse
     const evade = this.avoidFarmer();
+    const hasAttraction = attract.x !== 0 || attract.y !== 0;
     if (
       (evade.x && Math.abs(evade.x) > 0.0001) ||
       (evade.y && Math.abs(evade.y) > 0.0001)
     ) {
+      // Si están atraídas por ovejas negras, reducir la fuerza de evasión
+      const evasionMultiplier = hasAttraction ? 0.6 : 1.0; // reducir a 60% si hay atracción
+      evade.x *= evasionMultiplier;
+      evade.y *= evasionMultiplier;
+
       // Aplicar evasión con un clamp mayor para que no sea anulada por otras fuerzas
       const overrideClamp = this.maxForce * 6;
       this.applyForce(evade, overrideClamp);
@@ -618,7 +674,7 @@ async function loadGoatAssets() {
     if (success) {
       createFlock();
       // Crear 6 ovejas negras móviles en posiciones aleatorias
-      createStaticBlackSheep(6);
+      createStaticBlackSheep(8);
       // Actualizar HUD después de crear entidades
       if (typeof window.updateCounters === "function") {
         window.updateCounters(flock.length, staticSheep.length);

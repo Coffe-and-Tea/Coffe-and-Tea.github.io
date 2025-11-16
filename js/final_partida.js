@@ -77,7 +77,10 @@
     window.gameFrozen = true;
     try {
       // 1. Detener el timer
-      if (typeof window.gameTimer !== "undefined" && typeof window.gameTimer.stop === "function") {
+      if (
+        typeof window.gameTimer !== "undefined" &&
+        typeof window.gameTimer.stop === "function"
+      ) {
         window.gameTimer.stop();
         console.log("[freezeGame] Timer detenido.");
       }
