@@ -1,39 +1,49 @@
 Cosas por terminar/ implementar:
     Granjera:
-        - Ordenar el codigo de granjera 
-        - Agregar animaciones de ataque    ✅
-        - Movimiento de la camara.         ✅
-        - Acomodar animacion (le falta el pocho y la sombra)
+        - Ordenar el codigo de granjera. 
+        - Agregar animaciones de ataque.                        ✅
+        - Movimiento de la camara.                              ✅
+        - Acomodar animacion (le falta el pocho y la sombra).
 
     Animales:
-        - Agregar animaciones basicas de movimiento       ✅
-        - Implemenar mecanica de muerte
-        - Implemenar movimiento boid (grupos)             ✅
-        - Implemenar movimiento pausado (encarnados)      ✅
+        - Agregar animaciones basicas de movimiento.       ✅
+        - Implemenar mecanica de muerte.                   ✅
+        - Implemenar movimiento boid (grupos).             ✅
+        - Implemenar movimiento pausado (encarnados).      ✅
 
     Obstaculos:
-        - ballas (opcional)
-        - fardos (opcional)
-        - rocas  (opcional) ✅
-        - granja            ✅
+        - vallas (opcional).
+        - fardos (opcional).
+        - rocas  (opcional). ✅
+        - granja.            ✅ --> armar colisiones
 
-    Hud:
-        - Agregar contador de animales sanos      ✅
-        - Agregar contador de animales infectados ✅
-        - Agregar temporizador                    ✅
-        - Agregar HUD bien diseñado
+    UI:
+        - Agregar vision restringida alrededor de la granjera.
+        - Implementar luces.
+
+        Hud:
+            - Agregar contador de animales sanos.      ✅
+            - Agregar contador de animales infectados. ✅
+            - Agregar temporizador.                    ✅
+            - Agregar HUD bien diseñado.
 
     Pantallas: 
-        - Inicio: - Agregar iamgen con tuto
-                  - Boton de comenzar
+        - Inicio: - Agregar iamgen con tuto.
+                  - Boton de comenzar.       ✅
 
-        - Final: - Que la granjera se quede quieta cuando se pone la pantalla en negro cuando pierde ✅
-                 - Cuando gana que la pantalla se ponga en negro y salga un cartel de ganaste y jugar de  ✅
+        - Final: - Que la granjera se quede quieta cuando se pone la pantalla en negro cuando pierde.            ✅
+                 - Cuando gana que la pantalla se ponga en negro y salga un cartel de ganaste y jugar de nuevo.  ✅
 
+    Tutorial:
+        - Pantallas de lore.
+        - Pantallas de controles.
+        - Implementarlas.
+        
     Extras:
-        - Menu boton pausa
-        - ReadMe github 
-        - Arreglar botones (esteticamente hablando)
+        - Actualizar GDD.
+        - Menu boton pausa.
+        - ReadMe github (breve sinopsis).
+        - Arreglar botones (esteticamente hablando).
 
 
 
