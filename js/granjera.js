@@ -1,12 +1,17 @@
 // Posición central del personaje: Esta es la "verdad" de la posición.
-// Inicializar position defensivamente (si `app` aún no existe usamos viewport)
+// Inicializar en el centro del MUNDO (WORLD_WIDTH y WORLD_HEIGHT)
+// Fallback al viewport si no están disponibles
 let characterPos = {
   x:
-    typeof app !== "undefined" && app.screen
+    typeof WORLD_WIDTH !== "undefined"
+      ? WORLD_WIDTH / 2
+      : typeof app !== "undefined" && app.screen
       ? app.screen.width / 2
       : Math.round(window.innerWidth / 2),
   y:
-    typeof app !== "undefined" && app.screen
+    typeof WORLD_HEIGHT !== "undefined"
+      ? WORLD_HEIGHT / 2
+      : typeof app !== "undefined" && app.screen
       ? app.screen.height / 2
       : Math.round(window.innerHeight / 2),
 };

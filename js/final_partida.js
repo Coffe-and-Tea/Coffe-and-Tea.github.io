@@ -76,22 +76,48 @@
     if (window.gameFrozen) return;
     window.gameFrozen = true;
     try {
+      // 1. Detener el timer
+      if (typeof window.gameTimer !== "undefined" && typeof window.gameTimer.stop === "function") {
+        window.gameTimer.stop();
+        console.log("[freezeGame] Timer detenido.");
+      }
+
+      // 2. Remover bucles de juego conocidos (granjera, ovejas)
       if (pixiApp && pixiApp.ticker) {
-        // Remover bucles de juego conocidos (granjera, ovejas)
         if (typeof gameloop === "function") pixiApp.ticker.remove(gameloop);
         if (typeof goatGameloop === "function")
           pixiApp.ticker.remove(goatGameloop);
+        console.log("[freezeGame] Gameloops removidos del ticker.");
+      }
+
+      // 3. Pausar todas las animaciones de sprite (AnimatedSprite)
+      if (pixiApp && pixiApp.stage) {
+        const pauseAnimations = (container) => {
+          for (let child of container.children) {
+            if (child instanceof PIXI.AnimatedSprite) {
+              child.stop();
+            }
+            if (child.children && child.children.length > 0) {
+              pauseAnimations(child);
+            }
+          }
+        };
+        pauseAnimations(pixiApp.stage);
+        console.log("[freezeGame] Todas las animaciones pausadas.");
       }
     } catch (e) {
-      console.warn("[freezeGame] No se pudieron remover algunos tickers:", e);
+      console.warn("[freezeGame] Error durante congelamiento:", e);
     }
     console.log(
-      "[freezeGame] Juego congelado. Los gameloops principales fueron removidos."
+      "[freezeGame] Juego congelado. Timer, gameloops y animaciones detenidas."
     );
   };
 
   function createGameOverUI() {
     if (gameOverContainer) return; // Already created
+
+    // Congelar el juego cuando aparezca la pantalla de game-over
+    window.freezeGame();
 
     // Contenedor para agrupar el texto y los botones
     gameOverContainer = new PIXI.Container();
@@ -204,6 +230,9 @@
   // Nueva función para mostrar pantalla GANASTE (en rojo)
   function createWinUI() {
     if (gameOverContainer) return; // Already created
+
+    // Congelar el juego cuando aparezca la pantalla de victoria
+    window.freezeGame();
 
     gameOverContainer = new PIXI.Container();
     gameOverContainer.sortableChildren = true;
