@@ -373,6 +373,10 @@ function createFlock() {
     flock.push(goat);
   }
   app.ticker.add(goatGameloop);
+  // Notificar que se han creado las ovejas iniciales
+  if (typeof window.setInitialSheepCreated === "function") {
+    window.setInitialSheepCreated();
+  }
   console.log(`Simulación Boid iniciada: ${numGoats} cabras.`);
 }
 
@@ -757,18 +761,6 @@ function transformRandomWhiteToBlack() {
   // actualizar HUD si existe
   if (typeof window.updateCounters === "function")
     window.updateCounters(flock.length, staticSheep.length);
-
-  // Comprueba condición de reinicio: si hay más de la mitad convertidas a negras
-  const blackCount = staticSheep.length;
-  if (blackCount > numGoats / 2) {
-    // reiniciar juego (recargar página)
-    if (
-      typeof location !== "undefined" &&
-      typeof location.reload === "function"
-    ) {
-      location.reload();
-    }
-  }
 }
 
 // Convierte una fracción (0..1) del flock actual en ovejas negras.
@@ -787,14 +779,17 @@ function convertFractionWhiteToBlack(fraction) {
     indices[i] = indices[j];
     indices[j] = tmp;
   }
-  const selected = indices.slice(0, toConvert).map((i) => flock[i]).filter(Boolean);
+  const selected = indices
+    .slice(0, toConvert)
+    .map((i) => flock[i])
+    .filter(Boolean);
 
   // Transformar cada cabra seleccionada en oveja negra móvil
   for (let goat of selected) {
     if (!goat) continue;
     const x = goat.position.x;
     const y = goat.position.y;
-    if (typeof goat.removeSelf === 'function') goat.removeSelf();
+    if (typeof goat.removeSelf === "function") goat.removeSelf();
     else {
       const idx = flock.indexOf(goat);
       if (idx !== -1) flock.splice(idx, 1);
@@ -803,15 +798,8 @@ function convertFractionWhiteToBlack(fraction) {
   }
 
   // Actualizar HUD si existe
-  if (typeof window.updateCounters === 'function') window.updateCounters(flock.length, staticSheep.length);
-
-  // Comprobar condición de reinicio (misma lógica que en transformRandomWhiteToBlack)
-  const blackCount = staticSheep.length;
-  if (blackCount > numGoats / 2) {
-    if (typeof location !== 'undefined' && typeof location.reload === 'function') {
-      location.reload();
-    }
-  }
+  if (typeof window.updateCounters === "function")
+    window.updateCounters(flock.length, staticSheep.length);
 }
 
 // Exponer la función globalmente para que otros scripts (p.ej. temporizador) puedan llamarla

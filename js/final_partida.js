@@ -29,9 +29,12 @@
   const fadeInSpeed = 0.01; // fade speed
   const targetAlpha = 0.7; // target opacity
   let fadingIn = false; // flag to control the fade
+  let gameStarted = false; // flag para saber si el juego ya comenzó
+  let hasInitialSheep = false; // flag para verificar que se han creado ovejas inicialmente
 
   // --- Variables de la Interfaz de Game Over ---
   let gameOverContainer = null;
+  let isGameWon = false; // flag para evitar múltiples llamadas
   const GAME_OVER_TEXT_STYLE = {
     fontFamily: "Special Elite",
     fontSize: 36,
@@ -198,8 +201,113 @@
     console.log("[FADE CONTROLLER] UI de Game Over creada y mostrada.");
   }
 
+  // Nueva función para mostrar pantalla GANASTE (en rojo)
+  function createWinUI() {
+    if (gameOverContainer) return; // Already created
+
+    gameOverContainer = new PIXI.Container();
+    gameOverContainer.sortableChildren = true;
+
+    const ROUNDED_RECT_RADIUS = 10;
+
+    // Estilo para GANASTE (texto blanco sobre fondo rojo, más grande)
+    const WIN_STYLE = Object.assign({}, GAME_OVER_TEXT_STYLE, {
+      fontSize: 48,
+      fill: 0xffffff, // texto blanco
+      stroke: 0x000000,
+      strokeThickness: 4,
+    });
+
+    const winText = new PIXI.Text("¡GANASTE!", WIN_STYLE);
+    winText.anchor.set(0.5);
+
+    // Calcular tamaño del fondo de GANASTE
+    const winTextPadding = 12;
+    const winTextBgWidth = winText.width + 2 * winTextPadding;
+    const winTextBgHeight = winText.height + 2 * (winTextPadding / 2);
+
+    const textBackground = new PIXI.Graphics();
+    // Fondo ROJO para GANASTE (igual que PERDISTE)
+    textBackground.beginFill(0xff0000, 1);
+    textBackground.drawRoundedRect(
+      -winTextBgWidth / 2,
+      -winTextBgHeight / 2,
+      winTextBgWidth,
+      winTextBgHeight,
+      ROUNDED_RECT_RADIUS
+    );
+    textBackground.endFill();
+
+    // Posicionamiento de GANASTE (Texto + Fondo)
+    winText.y = -50;
+    textBackground.y = -50;
+
+    gameOverContainer.addChild(textBackground);
+    gameOverContainer.addChild(winText);
+
+    // 2. Botón "JUGAR DE NUEVO"
+    const BUTTON_STYLE = Object.assign({}, GAME_OVER_TEXT_STYLE, {
+      fill: 0x000000, // Color de texto NEGRO
+      stroke: 0xffffff, // Borde blanco
+      strokeThickness: 2,
+      fontSize: 24,
+    });
+
+    const buttonText = new PIXI.Text("JUGAR DE NUEVO", BUTTON_STYLE);
+    buttonText.anchor.set(0.5);
+
+    const button = new PIXI.Graphics();
+    const buttonPadding = 20;
+    const buttonWidth = buttonText.width + 2 * buttonPadding;
+    const buttonHeight = buttonText.height + buttonPadding;
+
+    // Dibujar el botón con fondo blanco
+    button.beginFill(0xffffff, 0.8);
+    button.drawRoundedRect(
+      -buttonWidth / 2,
+      -buttonHeight / 2,
+      buttonWidth,
+      buttonHeight,
+      ROUNDED_RECT_RADIUS
+    );
+    button.endFill();
+
+    // Hacerlo interactivo
+    button.interactive = true;
+    button.buttonMode = true;
+
+    // Listener para el click
+    button.on("pointerdown", () => {
+      console.log(
+        "[FADE CONTROLLER] Botón JUGAR DE NUEVO presionado. Recargando página..."
+      );
+      window.location.reload();
+    });
+
+    // Posicionar el botón
+    button.y = 50;
+    buttonText.y = 50;
+    gameOverContainer.addChild(button);
+    gameOverContainer.addChild(buttonText);
+
+    // Centrar el contenedor en el escenario
+    gameOverContainer.x = pixiApp.renderer.width / 2;
+    gameOverContainer.y = pixiApp.renderer.height / 2;
+
+    // Agregar el contenedor al Stage
+    pixiApp.stage.addChild(gameOverContainer);
+    console.log("[FADE CONTROLLER] UI de Victoria creada y mostrada.");
+  }
+
   // Function to start the fade
-  function startFadeIn() {
+  function startFadeIn(isWin = false) {
+    // Solo empezar si el juego ha comenzado
+    if (!gameStarted) {
+      gameStarted = true;
+      console.log("[FADE CONTROLLER] Juego iniciado.");
+    }
+    // Resetear el flag de victoria para evitar que aparezca GANASTE al reiniciar
+    isGameWon = false;
     // Solo empezar si no está atenuando
     if (!fadingIn && overlayAlpha < targetAlpha) {
       fadingIn = true;
@@ -224,6 +332,36 @@
 
   // Update the overlay every frame (using PIXI ticker)
   pixiApp.ticker.add(() => {
+    // Detectar victoria: si staticSheep está vacío (todas las ovejas negras muertas)
+    // y el juego ha comenzado, hay ovejas iniciales, y no ha terminado por timeout
+    if (
+      gameStarted &&
+      hasInitialSheep &&
+      !isGameWon &&
+      typeof staticSheep !== "undefined" &&
+      Array.isArray(staticSheep) &&
+      staticSheep.length === 0 &&
+      !fadingIn &&
+      overlayAlpha < targetAlpha
+    ) {
+      // Condición de victoria detectada
+      isGameWon = true;
+      console.log(
+        "[FADE CONTROLLER] ¡Todas las ovejas negras han sido eliminadas! Victoria detectada."
+      );
+
+      // Iniciar el fade-in para mostrar pantalla GANASTE
+      fadingIn = true;
+      pixiApp.stage.setChildIndex(overlay, pixiApp.stage.children.length - 1);
+
+      // Congelar el juego
+      try {
+        if (typeof window.freezeGame === "function") window.freezeGame();
+      } catch (e) {
+        console.warn("[FADE CONTROLLER] freezeGame failed:", e);
+      }
+    }
+
     if (fadingIn) {
       overlayAlpha += fadeInSpeed;
 
@@ -235,16 +373,14 @@
           `[FADE CONTROLLER] Fade-in finished at ${targetAlpha * 100}%.`
         );
 
-        // *** LLAMADA CRÍTICA: Mostrar la UI de Game Over ***
-        createGameOverUI();
-        // Congelar la lógica del juego ahora que la UI de fin aparece
-        try {
-          if (typeof window.freezeGame === "function") window.freezeGame();
-        } catch (e) {
-          console.warn("freezeGame failed", e);
+        // Mostrar la UI apropiada (GANASTE o PERDISTE)
+        if (isGameWon) {
+          createWinUI();
+        } else {
+          createGameOverUI();
         }
 
-        // Asegúrate de que la UI de Game Over esté *encima* del overlay
+        // Asegúrate de que la UI esté *encima* del overlay
         if (gameOverContainer) {
           pixiApp.stage.setChildIndex(
             gameOverContainer,
@@ -262,4 +398,31 @@
 
   // Expose the function globally
   window.startScreenFadeIn = startFadeIn;
+
+  // Función para activar el flag de juego comenzado (llamada desde temporizador)
+  window.setGameStarted = function () {
+    // Resetear todos los flags para permitir una nueva partida
+    gameStarted = true;
+    isGameWon = false;
+    fadingIn = false;
+    overlayAlpha = 0;
+    overlay.alpha = 0;
+    hasInitialSheep = false; // Resetear para verificar que hay ovejas
+    if (gameOverContainer) {
+      try {
+        pixiApp.stage.removeChild(gameOverContainer);
+      } catch (e) {}
+      gameOverContainer = null;
+    }
+    window.gameFrozen = false; // Resetear el flag de congelamiento
+    console.log(
+      "[FADE CONTROLLER] Juego comenzado. Todos los flags reseteados."
+    );
+  };
+
+  // Función para registrar que se han creado ovejas iniciales
+  window.setInitialSheepCreated = function () {
+    hasInitialSheep = true;
+    console.log("[FADE CONTROLLER] Ovejas iniciales detectadas.");
+  };
 })();

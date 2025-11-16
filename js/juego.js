@@ -1,10 +1,30 @@
 // Creamos la app de pixi
 const app = new PIXI.Application({
-  width: 1920,
-  height: 1080,
+  width: window.innerWidth,
+  height: window.innerHeight,
   antialias: true,
   resizeTo: window,
 });
+
+// Remover márgenes y padding del body y html
+document.documentElement.style.margin = "0";
+document.documentElement.style.padding = "0";
+document.documentElement.style.width = "100%";
+document.documentElement.style.height = "100%";
+document.documentElement.style.overflow = "hidden";
+
+document.body.style.margin = "0";
+document.body.style.padding = "0";
+document.body.style.width = "100%";
+document.body.style.height = "100%";
+document.body.style.overflow = "hidden";
+
+// Remover márgenes del canvas y hacerlo fullscreen
+app.view.style.margin = "0";
+app.view.style.padding = "0";
+app.view.style.display = "block";
+app.view.style.width = "100%";
+app.view.style.height = "100%";
 
 document.body.appendChild(app.view);
 // Configuramos tamaño del mundo (doble del viewport)

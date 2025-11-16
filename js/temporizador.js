@@ -1,10 +1,11 @@
 // temporizador.js (PIXI HUD)
 
-const tiempo_inicial = 30; // segundos iniciales (aumentado a 30)
+const tiempo_inicial = 80; // 30s primera fase + 50s segunda fase
 let timeLeft = tiempo_inicial;
 let timerInterval = null;
 let pixiTimerText = null;
 let blinkState = false;
+let firstPhaseConverted = false; // flag para convertir 1/3 después de 30s
 
 function formatTime(seconds) {
   const hours = Math.floor(seconds / 3600);
@@ -59,14 +60,18 @@ function updatePixiDisplay() {
   if (!pixiTimerText) return;
   pixiTimerText.text = formatTime(Math.max(0, timeLeft));
 
-  if (timeLeft <= 10 && timeLeft > 0) {
-    // parpadeo entre rojo y blanco solo en los últimos 10 segundos
+  // Estructura: 80-50 (primera fase 30s), 50-0 (segunda fase 50s)
+  // Primera fase: parpadea cuando 60 > timeLeft >= 50 (últimos 10s de primera fase)
+  // Segunda fase: parpadea cuando 10 > timeLeft >= 0 (últimos 10s de segunda fase)
+
+  if ((timeLeft <= 60 && timeLeft > 50) || (timeLeft <= 10 && timeLeft > 0)) {
+    // parpadeo entre rojo y blanco en los últimos 10 segundos de cada fase
     blinkState = !blinkState;
     pixiTimerText.style.fill = blinkState ? "#ff0000" : "#ffffff";
   } else if (timeLeft === 0) {
     pixiTimerText.style.fill = "#ff0000";
   } else {
-    // antes de los 10 segundos, mantener blanco
+    // fuera de los últimos 10 segundos, mantener blanco
     pixiTimerText.style.fill = "#ffffff";
   }
 }
@@ -78,24 +83,36 @@ function tick() {
     timeLeft = 0;
     updatePixiDisplay();
 
-    // Inicia el desvanecimiento de pantalla (Game Over UI)
+    // Al terminar los 60s totales:
+    // 1. Convertir todas las ovejas blancas restantes a negras
+    if (typeof window.convertFractionWhiteToBlack === "function") {
+      window.convertFractionWhiteToBlack(1); // convertir 100% de blancas
+      console.log(
+        "Temporizador finalizado. Todas las ovejas blancas convertidas a negras."
+      );
+    }
+
+    // 2. Inicia el desvanecimiento de pantalla (Game Over UI)
     if (typeof window.startScreenFadeIn === "function") {
       window.startScreenFadeIn();
       console.log(
         "Temporizador finalizado. Iniciando desvanecimiento de pantalla."
       );
     }
-
-    // Convertir un tercio de las ovejas blancas a negras una sola vez cuando finaliza el temporizador
-    if (
-      !window.sheepConvertedByTimer &&
-      typeof window.convertFractionWhiteToBlack === "function"
-    ) {
-      window.sheepConvertedByTimer = true;
-      window.convertFractionWhiteToBlack(1 / 3);
-    }
     return;
   }
+
+  // Cuando faltan exactamente 50s (después de la primera fase), convertir 1/4 de blancas
+  if (timeLeft === 50 && !firstPhaseConverted) {
+    firstPhaseConverted = true;
+    if (typeof window.convertFractionWhiteToBlack === "function") {
+      window.convertFractionWhiteToBlack(1 / 4);
+      console.log(
+        "Primera fase completada. 1/4 de ovejas blancas convertidas a negras."
+      );
+    }
+  }
+
   timeLeft--;
   updatePixiDisplay();
 }
@@ -104,8 +121,14 @@ function startTimer() {
   if (!pixiTimerText) createPixiTimer();
   if (timerInterval) clearInterval(timerInterval);
   timeLeft = tiempo_inicial;
-  window.sheepConvertedByTimer = false;
+  firstPhaseConverted = false;
   updatePixiDisplay();
+
+  // Activar el flag de juego comenzado para permitir detección de victoria
+  if (typeof window.setGameStarted === "function") {
+    window.setGameStarted();
+  }
+
   timerInterval = setInterval(tick, 1000);
 }
 
@@ -122,13 +145,9 @@ window.gameTimer.start = startTimer;
 window.gameTimer.stop = stopTimer;
 window.gameTimer.reset = () => {
   timeLeft = tiempo_inicial;
+  firstPhaseConverted = false;
   updatePixiDisplay();
 };
 
-// Iniciar automáticamente al cargar el script si el contenedor ya existe
-try {
-  if (typeof hudContainer !== "undefined" || typeof app !== "undefined")
-    startTimer();
-} catch (e) {
-  console.warn("No se pudo iniciar el temporizador automáticamente:", e);
-}
+// NO iniciar automáticamente - esperar a que juego.js lo inicie
+// El temporizador se inicia cuando el juego está listo
