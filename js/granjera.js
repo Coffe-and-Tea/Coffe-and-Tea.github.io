@@ -465,12 +465,18 @@ function performKillLogic() {
       const dy = animal.sprite.y - granjeraY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       if (distance < KILL_RADIUS) {
+        console.log(
+          `[GRANJERA] Matada oveja negra. staticSheep.length antes: ${staticSheep.length}`
+        );
         if (typeof animal.removeSelf === "function") {
           animal.removeSelf();
         } else {
           animal.sprite.visible = false;
           staticSheep.splice(i, 1);
         }
+        console.log(
+          `[GRANJERA] Oveja negra eliminada. staticSheep.length después: ${staticSheep.length}`
+        );
         break;
       }
     }
@@ -494,6 +500,12 @@ function performKillLogic() {
       );
     }
   } catch (e) {}
+
+  // Revisar si se alcanzó la victoria (todas las ovejas negras muertas)
+  if (typeof window.checkVictory === "function") {
+    console.log("[GRANJERA] Llamando a checkVictory()");
+    window.checkVictory();
+  }
 }
 
 // Se añade el gameloop al ticker

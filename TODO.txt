@@ -21,18 +21,19 @@ Cosas por terminar/ implementar:
         - Agregar contador de animales sanos      ✅
         - Agregar contador de animales infectados ✅
         - Agregar temporizador                    ✅
+        - Agregar HUD bien diseñado
 
     Pantallas: 
         - Inicio: - Agregar iamgen con tuto
                   - Boton de comenzar
 
-        - Final: - Que la granjera se quede quieta cuando se pone la pantalla en negro cuando pierde
-                 - Cuando gana que la pantalla se ponga en negro y salga un cartel de ganaste y jugar de nuevo
+        - Final: - Que la granjera se quede quieta cuando se pone la pantalla en negro cuando pierde ✅
+                 - Cuando gana que la pantalla se ponga en negro y salga un cartel de ganaste y jugar de  ✅
 
     Extras:
-        - Menu botn pausa
-        - ReadMe gitgit 
-        - Arrglar botones (esteticamente hablando)
+        - Menu boton pausa
+        - ReadMe github 
+        - Arreglar botones (esteticamente hablando)
 
 
 

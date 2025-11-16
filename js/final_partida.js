@@ -332,34 +332,11 @@
 
   // Update the overlay every frame (using PIXI ticker)
   pixiApp.ticker.add(() => {
-    // Detectar victoria: si staticSheep está vacío (todas las ovejas negras muertas)
-    // y el juego ha comenzado, hay ovejas iniciales, y no ha terminado por timeout
-    if (
-      gameStarted &&
-      hasInitialSheep &&
-      !isGameWon &&
-      typeof staticSheep !== "undefined" &&
-      Array.isArray(staticSheep) &&
-      staticSheep.length === 0 &&
-      !fadingIn &&
-      overlayAlpha < targetAlpha
-    ) {
-      // Condición de victoria detectada
-      isGameWon = true;
+    // Log para debugging
+    if (fadingIn) {
       console.log(
-        "[FADE CONTROLLER] ¡Todas las ovejas negras han sido eliminadas! Victoria detectada."
+        `[TICKER] fadingIn=true, overlayAlpha=${overlayAlpha}, targetAlpha=${targetAlpha}`
       );
-
-      // Iniciar el fade-in para mostrar pantalla GANASTE
-      fadingIn = true;
-      pixiApp.stage.setChildIndex(overlay, pixiApp.stage.children.length - 1);
-
-      // Congelar el juego
-      try {
-        if (typeof window.freezeGame === "function") window.freezeGame();
-      } catch (e) {
-        console.warn("[FADE CONTROLLER] freezeGame failed:", e);
-      }
     }
 
     if (fadingIn) {
@@ -407,7 +384,8 @@
     fadingIn = false;
     overlayAlpha = 0;
     overlay.alpha = 0;
-    hasInitialSheep = false; // Resetear para verificar que hay ovejas
+    // NO resetear hasInitialSheep aquí: las ovejas pueden haber sido creadas
+    // antes de que el jugador presione COMENZAR. Mantener el estado.
     if (gameOverContainer) {
       try {
         pixiApp.stage.removeChild(gameOverContainer);
@@ -424,5 +402,63 @@
   window.setInitialSheepCreated = function () {
     hasInitialSheep = true;
     console.log("[FADE CONTROLLER] Ovejas iniciales detectadas.");
+  };
+
+  // Función para revisar la victoria manualmente (llamada después de matar una oveja)
+  window.checkVictory = function () {
+    console.log("[VICTORY CHECK] Función llamada");
+
+    // Acceder a staticSheep a través de window (expuesto desde ovejas.js)
+    const staticSheepArray =
+      typeof window.staticSheep !== "undefined"
+        ? window.staticSheep
+        : typeof staticSheep !== "undefined"
+        ? staticSheep
+        : null;
+
+    if (!staticSheepArray || !Array.isArray(staticSheepArray)) {
+      console.error(
+        `[VICTORY CHECK] ERROR: staticSheep no es accesible o no es un array. tipo: ${typeof staticSheepArray}`
+      );
+      return;
+    }
+
+    console.log(
+      `[VICTORY CHECK] Estado del juego: gameStarted=${gameStarted}, hasInitialSheep=${hasInitialSheep}, isGameWon=${isGameWon}, staticSheep.length=${staticSheepArray.length}, fadingIn=${fadingIn}`
+    );
+
+    // Verificar si se cumplen TODAS las condiciones de victoria
+    if (
+      gameStarted &&
+      hasInitialSheep &&
+      !isGameWon &&
+      staticSheepArray.length === 0
+    ) {
+      console.log("[VICTORY CHECK] ¡¡¡VICTORIA DETECTADA!!!");
+      isGameWon = true;
+
+      // Congelar el juego primero
+      try {
+        if (typeof window.freezeGame === "function") {
+          window.freezeGame();
+        }
+      } catch (e) {
+        console.warn("[VICTORY CHECK] freezeGame failed:", e);
+      }
+
+      // Iniciar el fade directamente
+      if (!fadingIn) {
+        console.log("[VICTORY CHECK] Iniciando fade...");
+        fadingIn = true;
+        overlayAlpha = 0;
+        pixiApp.stage.setChildIndex(overlay, pixiApp.stage.children.length - 1);
+      }
+    } else {
+      console.log(
+        `[VICTORY CHECK] Condiciones no cumplidas: gameStarted=${gameStarted}, hasInitialSheep=${hasInitialSheep}, !isGameWon=${!isGameWon}, staticSheep.length===0=${
+          staticSheepArray.length === 0
+        }`
+      );
+    }
   };
 })();

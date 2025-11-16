@@ -85,9 +85,11 @@ for (let r of piedras) {
   });
 }
 
-// Iniciamos el temporizador cuando la ventana cargue
+// Iniciamos la pantalla de inicio cuando la ventana cargue
+// El timer se iniciará cuando el usuario presione "COMENZAR"
 window.addEventListener("load", () => {
-  if (window.gameTimer) {
-    window.gameTimer.start();
+  console.log("[GAME] Window loaded. Showing start screen.");
+  if (typeof window.showStartScreen === "function") {
+    window.showStartScreen();
   }
 });

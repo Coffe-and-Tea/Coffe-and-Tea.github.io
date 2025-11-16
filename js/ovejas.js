@@ -4,6 +4,16 @@ const flock = [];
 const loadedTextures = {}; // Almacena los frames de animación cargados
 console.log("ovejas.js cargado. numGoats=", numGoats);
 
+// DEBUG: confirmar que `app` y `window` existen en este punto
+console.log(
+  "[OVEJAS DEBUG] app:",
+  typeof app !== "undefined" ? "defined" : "undefined",
+  "window.hasInitialSheep:",
+  typeof window.hasInitialSheep !== "undefined"
+    ? window.hasInitialSheep
+    : "undefined"
+);
+
 // Definiciones de las rutas
 const SHEETS = ["goat_beige_w", "goat_beige_a", "goat_beige_s", "goat_beige_d"];
 const BLACK_SHEETS = [
@@ -20,7 +30,21 @@ const BLACK_BASE = "animaciones_animales/goat_black/";
 // Array para ovejas negras estáticas (objetos con { sprite, removeSelf })
 const staticSheep = [];
 
+// Exponer staticSheep globalmente para que otros scripts puedan accederlo
+window.staticSheep = staticSheep;
+
 // HUD ahora está centralizado en js/contadores.js: usamos su API si existe
+
+// Flag global para saber si se han creado las ovejas iniciales
+window.hasInitialSheep = false;
+
+// Inicializar setInitialSheepCreated si no existe (fallback)
+if (typeof window.setInitialSheepCreated !== "function") {
+  window.setInitialSheepCreated = function () {
+    window.hasInitialSheep = true;
+    console.log("[OVEJAS] Ovejas iniciales detectadas (via ovejas.js)");
+  };
+}
 
 // =========================================================
 // **  1. CLASE GOATBOID (Boid con Animación Direccional) **
@@ -137,9 +161,10 @@ class GoatBoid {
       this.sprite.textures = loadedTextures[newAnimKey];
       this.sprite.play();
     }
-  }
 
-  // Wander: comportamiento de deriva aleatoria para diversificar direcciones
+    // HUD ahora está centralizado en js/contadores.js: usamos su API si existe
+    // Wander: comportamiento de deriva aleatoria para diversificar direcciones
+  }
   wander() {
     // cambiar ligeramente el ángulo
     this.wanderAngle += (Math.random() - 0.5) * this.wanderChange;
@@ -559,7 +584,13 @@ async function loadGoatAssets() {
     await PIXI.Assets.init({ manifest: manifest });
     const resources = await PIXI.Assets.loadBundle("goatBundle");
 
+    console.log(
+      "[OVEJAS] PIXI.Assets.loadBundle returned. resources keys:",
+      Object.keys(resources)
+    );
+
     let success = true;
+    console.log("[OVEJAS] Texturas cargadas correctamente. Creando flock...");
 
     // Procesamos todas las assets del bundle (tanto beige como black)
     Object.keys(manifest.bundles[0].assets).forEach((s) => {
