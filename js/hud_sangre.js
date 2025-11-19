@@ -1,5 +1,7 @@
+// HUD - Overlay de sangre
+
 //Overlay de sangre en la pantalla
-window.bloodEffectActive = false; // Exponer para que el timer lo cambie
+window.bloodEffectActive = false; 
 window.bloodMaxStatic = false;
 
 const sangre = PIXI.Sprite.from("images/sangre.png");
@@ -36,27 +38,24 @@ if (typeof app !== "undefined") {
 
 // Animación del efecto de sangre
 if (typeof app !== "undefined") {
-    app.ticker.add(() => {
-        // *** NUEVA LÓGICA: Si el estado estático está activo, forzar el alpha máximo ***
-        if (window.bloodMaxStatic) {
-            sangre.alpha = bloodMaxOpacity;
-            return; // Detener la ejecución del titileo
-        }
-
-        // Usa la variable global para el control del timer
-        if (window.bloodEffectActive) {
-            sangre.alpha += bloodOpacitySpeed * bloodOpacityDirection;
-
-            if (sangre.alpha >= bloodMaxOpacity) {
-                sangre.alpha = bloodMaxOpacity;
-                bloodOpacityDirection = -1;
-            }
-            else if (sangre.alpha <= bloodMinOpacity) {
-                sangre.alpha = bloodMinOpacity;
-                bloodOpacityDirection = 1;
-            }
-        } else {
-            sangre.alpha = 0; // Se oculta si no está activo
-        }
-    });
+    app.ticker.add(() => {
+    
+        if (window.bloodMaxStatic) {
+            sangre.alpha = bloodMaxOpacity;
+            return;
+        }
+        if (window.bloodEffectActive) {
+            sangre.alpha += bloodOpacitySpeed * bloodOpacityDirection;
+            if (sangre.alpha >= bloodMaxOpacity) {
+                sangre.alpha = bloodMaxOpacity;
+                bloodOpacityDirection = -1;
+            }
+            else if (sangre.alpha <= bloodMinOpacity) {
+                sangre.alpha = bloodMinOpacity;
+                bloodOpacityDirection = 1;
+            }
+        } else {
+            sangre.alpha = 0;
+        }
+    });
 }
