@@ -16,36 +16,33 @@
     return;
   }
 
-  // DEBUG: Confirm the script is executing
-  console.log("[FADE CONTROLLER] Script initialized and PIXI app found.");
-
-  // --- Variables de FADE ---
+  // Variables de FADE
   const overlay = new PIXI.Graphics();
   overlay.alpha = 0;
   overlay.position.set(0, 0);
   pixiApp.stage.addChild(overlay);
 
   let overlayAlpha = 0;
-  const fadeInSpeed = 0.01; // fade speed
-  const targetAlpha = 0.7; // target opacity
-  let fadingIn = false; // flag to control the fade
-  let gameStarted = false; // flag para saber si el juego ya comenzó
-  let hasInitialSheep = false; // flag para verificar que se han creado ovejas inicialmente
+  const fadeInSpeed = 0.01;
+  const targetAlpha = 0.7;
+  let fadingIn = false;
+  let gameStarted = false;
+  let hasInitialSheep = false;
 
-  // --- Variables de la Interfaz de Game Over ---
+  // Variables de la Interfaz de Game Over
   let gameOverContainer = null;
-  let isGameWon = false; // flag para evitar múltiples llamadas
+  let isGameWon = false;
   const GAME_OVER_TEXT_STYLE = {
     fontFamily: "Special Elite",
     fontSize: 36,
-    fill: 0xffffff, // #ffffff
-    stroke: 0x000000, // #000
-    strokeThickness: 4, // Para simular el text-shadow de 2px
+    fill: 0xffffff,
+    stroke: 0x000000,
+    strokeThickness: 4,
     dropShadow: false,
     align: "center",
   };
 
-  // --- Lógica del FADE y Redimensionamiento ---
+  // Lógica del FADE y Redimensionamiento
 
   // Function to update the black layer size if the canvas resizes
   function updateOverlaySize() {
@@ -70,30 +67,28 @@
   // Listen to the PIXI renderer resize event
   pixiApp.renderer.on("resize", updateOverlaySize);
 
-  // --- Lógica de la Interfaz de Game Over CORREGIDA ---
-  // --- Función para congelar la lógica del juego (pausar gameloops de juego pero mantener UI) ---
+  // Lógica de la Interfaz de Game Over
+  // Función pausar el gameloop y animaciones
   window.freezeGame = function () {
     if (window.gameFrozen) return;
     window.gameFrozen = true;
     try {
-      // 1. Detener el timer
+      // Detener el timer
       if (
         typeof window.gameTimer !== "undefined" &&
         typeof window.gameTimer.stop === "function"
       ) {
         window.gameTimer.stop();
-        console.log("[freezeGame] Timer detenido.");
       }
 
-      // 2. Remover bucles de juego conocidos (granjera, ovejas)
+      // Remover bucles de juego conocidos (granjera, ovejas)
       if (pixiApp && pixiApp.ticker) {
         if (typeof gameloop === "function") pixiApp.ticker.remove(gameloop);
         if (typeof goatGameloop === "function")
           pixiApp.ticker.remove(goatGameloop);
-        console.log("[freezeGame] Gameloops removidos del ticker.");
       }
 
-      // 3. Pausar todas las animaciones de sprite (AnimatedSprite)
+      // Pausar todas las animaciones de sprite (AnimatedSprite)
       if (pixiApp && pixiApp.stage) {
         const pauseAnimations = (container) => {
           for (let child of container.children) {
@@ -106,7 +101,6 @@
           }
         };
         pauseAnimations(pixiApp.stage);
-        console.log("[freezeGame] Todas las animaciones pausadas.");
       }
     } catch (e) {
       console.warn("[freezeGame] Error durante congelamiento:", e);
@@ -209,9 +203,6 @@
 
     // Listener para el click
     button.on("pointerdown", () => {
-      console.log(
-        "[FADE CONTROLLER] Botón REINICIAR presionado. Recargando página..."
-      );
       window.location.reload();
     });
 
@@ -227,7 +218,6 @@
 
     // Agregar el contenedor al Stage
     pixiApp.stage.addChild(gameOverContainer);
-    console.log("[FADE CONTROLLER] UI de Game Over creada y mostrada.");
   }
 
   // Nueva función para mostrar pantalla GANASTE (en rojo)

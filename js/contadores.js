@@ -1,24 +1,23 @@
-// Contadores HUD: crea y actualiza los contadores de ovejas
+// Crea y actualiza los contadores de ovejas
 (function () {
   let whiteCountText = null;
   let blackCountText = null;
-  // estilo basado en temporizador.css (Special Elite)
-const styleWhite = new PIXI.TextStyle({
-    fontFamily: "Special Elite",
-    fontSize: 36, // Aumentado a 36px
-    fill: '#ffffff', // Color del texto principal: Blanco
-    stroke: '#000000', // Color del "borde/sombra": Negro
-    strokeThickness: 4, // Aumentado para simular el efecto de sombra (text-shadow)
-});
 
-const styleBlack = new PIXI.TextStyle({
+  const styleWhite = new PIXI.TextStyle({
     fontFamily: "Special Elite",
-    fontSize: 36, // Aumentado a 36px
-    fill: '#ffffff', // Color del texto principal: Blanco
-    stroke: '#000000', // Color del "borde/sombra": Negro
-    strokeThickness: 4, // Aumentado para simular el efecto de sombra (text-shadow)
+    fontSize: 36,
+    fill: "#ffffff",
+    stroke: "#000000",
+    strokeThickness: 4,
+  });
 
-});
+  const styleBlack = new PIXI.TextStyle({
+    fontFamily: "Special Elite",
+    fontSize: 36,
+    fill: "#ffffff",
+    stroke: "#000000",
+    strokeThickness: 4,
+  });
 
   function initCounters(hud) {
     try {

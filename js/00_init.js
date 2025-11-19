@@ -1,5 +1,5 @@
-// 00_init.js - Inicialización de variables y funciones globales
-// Este archivo se debe cargar PRIMERO para asegurar que todas las funciones globales existan
+// Inicialización de variables y funciones globales
+// Despues son todas sobreescritas por otra funcion.
 
 // Flag para saber si el juego ha comenzado
 window.gameStarted = false;
@@ -13,18 +13,18 @@ window.isGameWon = false;
 // Flag para saber si el juego está congelado
 window.gameFrozen = false;
 
-// Función placeholder para setInitialSheepCreated (será sobrescrita por final_partida.js)
+// Función placeholder para setInitialSheepCreated
 window.setInitialSheepCreated = function () {
   window.hasInitialSheep = true;
   console.log("[INIT] Ovejas iniciales detectadas.");
 };
 
-// Función placeholder para checkVictory (será sobrescrita por final_partida.js)
+// Función placeholder para checkVictory
 window.checkVictory = function () {
   console.log("[INIT] checkVictory placeholder");
 };
 
-// Función placeholder para freezeGame (será sobrescrita por final_partida.js)
+// Función placeholder para freezeGame
 window.freezeGame = function () {
   window.gameFrozen = true;
   console.log("[INIT] freezeGame placeholder");
