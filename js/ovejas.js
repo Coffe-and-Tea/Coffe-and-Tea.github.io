@@ -23,11 +23,11 @@ const BLACK_SHEETS = [
   "goat_black_d",
 ];
 
-// Rutas relativas (sin slash inicial para funcionar desde server http)
+// Rutas relativas
 const BASE_PATH = "animaciones_animales/cabra_beige/";
 const BLACK_BASE = "animaciones_animales/goat_black/";
 
-// Array para ovejas negras estáticas (objetos con { sprite, removeSelf })
+// Array para ovejas negras estáticas
 const staticSheep = [];
 
 // Exponer staticSheep globalmente para que otros scripts puedan accederlo
@@ -42,13 +42,10 @@ window.hasInitialSheep = false;
 if (typeof window.setInitialSheepCreated !== "function") {
   window.setInitialSheepCreated = function () {
     window.hasInitialSheep = true;
-    console.log("[OVEJAS] Ovejas iniciales detectadas (via ovejas.js)");
   };
 }
 
-// =========================================================
 // **  1. CLASE GOATBOID (Boid con Animación Direccional) **
-// =========================================================
 
 class GoatBoid {
   constructor(x, y) {
@@ -65,10 +62,7 @@ class GoatBoid {
 
     // Variables Boid
     this.position = new PIXI.Point(x, y);
-    // Inicializamos la velocidad con dirección aleatoria y magnitud aleatoria
-    // (evita dividir por cero si el vector casual queda en 0)
-    // Velocidad moderada: suficiente para moverse pero no demasiado rápida
-    this.maxSpeed = 1.4;
+    this.maxSpeed = 1.4; // Inicializamos la velocidad con dirección aleatoria y magnitud aleatoria
     const ang = Math.random() * Math.PI * 2;
     const sp = Math.random() * this.maxSpeed;
     this.velocity = new PIXI.Point(Math.cos(ang) * sp, Math.sin(ang) * sp);
@@ -79,14 +73,11 @@ class GoatBoid {
     this.avoidRadius = 120; // radio en píxeles en el que la cabra empezará a alejarse
     this.avoidForce = 1.8; // fuerza base de evasión; aumentada para respuesta más perceptible
     this.minFarmerDistance = 48; // distancia de seguridad alrededor de la granjera
-    // Wander (deambular) para evitar que todas vayan en la misma dirección
-    this.wanderAngle = Math.random() * Math.PI * 2;
+    this.wanderAngle = Math.random() * Math.PI * 2; // Wander para evitar que todas vayan en la misma dirección
     this.wanderRadius = 6; // radio del círculo de wander
     this.wanderDistance = 10; // distancia del círculo desde la posición
     this.wanderChange = 0.4; // cuánto puede cambiar el ángulo por frame
     this.wanderStrength = 0.15; // fuerza de steering del wander (menor para movimiento más lento)
-
-    // No normalizamos aquí porque ya inicializamos con magnitud <= maxSpeed
   }
 
   // Permite que la granjera (variable global `characterPos`) pueda forzar que la cabra se aleje.
@@ -97,7 +88,7 @@ class GoatBoid {
     const dy = this.position.y - characterPos.y;
     const d = Math.sqrt(dx * dx + dy * dy);
 
-    // Caso degenerado: aplicamos una pequeña fuerza aleatoria para salir
+    // Caso degenerado: aplicamos una pequeña fuerza aleatoria para salir (este comentario lo puso la ia y lo vamos solo xq es chistoso el concepto de caso degenerado)
     if (d === 0) {
       const ux = Math.random() - 0.5 || 0.1;
       const uy = Math.random() - 0.5 || 0.1;
@@ -161,10 +152,9 @@ class GoatBoid {
       this.sprite.textures = loadedTextures[newAnimKey];
       this.sprite.play();
     }
-
-    // HUD ahora está centralizado en js/contadores.js: usamos su API si existe
-    // Wander: comportamiento de deriva aleatoria para diversificar direcciones
   }
+
+  // Wander: comportamiento de deriva aleatoria para diversificar direcciones
   wander() {
     // cambiar ligeramente el ángulo
     this.wanderAngle += (Math.random() - 0.5) * this.wanderChange;
@@ -182,8 +172,7 @@ class GoatBoid {
   }
 
   applyForce(force) {
-    // Compatibilidad: aceptar override opcional para maxForce (prioridad de la fuerza)
-    // Si se pasa un objeto en vez de punto, tratamos como (force, maxOverride)
+    // Aceptar override opcional para maxForce (prioridad de la fuerza)
     let maxOverride = null;
     if (arguments.length > 1 && typeof arguments[1] === "number")
       maxOverride = arguments[1];
@@ -207,7 +196,6 @@ class GoatBoid {
 
   update() {
     // Añadimos un pequeño ruido aleatorio para evitar que todos tomen la misma trayectoria
-    // Magnitud reducida para movimiento más lento
     this.velocity.x += (Math.random() - 0.5) * 0.02;
     this.velocity.y += (Math.random() - 0.5) * 0.02;
     // Limitar magnitud de velocidad
@@ -237,7 +225,7 @@ class GoatBoid {
     const halfH = Math.max(this.sprite.height, 16) * 0.5;
     if (this.position.x > screenWidth - halfW) {
       this.position.x = screenWidth - halfW;
-      this.velocity.x *= -0.3; // rebotec suave
+      this.velocity.x *= -0.3;
     } else if (this.position.x < halfW) {
       this.position.x = halfW;
       this.velocity.x *= -0.3;
@@ -322,7 +310,7 @@ class GoatBoid {
     return centerOfMass;
   }
 
-  // Atracción hacia ovejas negras (staticSheep)
+  // Atracción hacia ovejas negras
   attractToBlackSheep(blackSheepArray) {
     let attraction = new PIXI.Point(0, 0);
     if (!blackSheepArray || blackSheepArray.length === 0) {
@@ -353,7 +341,7 @@ class GoatBoid {
       const d = nearestDist;
 
       // Fuerza que aumenta cuando más cercana está la oveja negra
-      const strength = (1 - d / attractionRadius) * 0.8; // de 0.8 a 0
+      const strength = (1 - d / attractionRadius) * 0.7; // de 0.8 a 0
 
       attraction.x = (dx / d) * strength;
       attraction.y = (dy / d) * strength;
@@ -375,7 +363,6 @@ class GoatBoid {
       typeof window.staticSheep !== "undefined" ? window.staticSheep : []
     );
 
-    // Pesos (tuneables)
     // Ajustes para dispersión: incrementar separación y wander, reducir alineamiento y cohesión
     const SEP_W = 2.2;
     const ALI_W = 0.15;
@@ -436,9 +423,7 @@ class GoatBoid {
   }
 }
 
-// ==============================================
 // **  2. FUNCIONES DE CARGA E INICIALIZACIÓN  **
-// ==============================================
 
 function createFlock() {
   for (let i = 0; i < numGoats; i++) {
@@ -554,7 +539,6 @@ function goatGameloop() {
 
 // Función para procesar el JSON y extraer los frames de animación
 function extractFrames(sheetData, sheetName, baseDir) {
-  // 🚨 Corrección: Solo necesitamos que el objeto 'frames' exista en el JSON.
   if (!sheetData || !sheetData.frames) {
     console.error(
       `Error de estructura JSON en ${sheetName}.json: Faltan 'frames' o el JSON está vacío.`
@@ -614,9 +598,7 @@ function extractFrames(sheetData, sheetName, baseDir) {
     .filter(Boolean); // Eliminamos cualquier frame nulo o mal formado
 }
 
-// ===========================================================
 // ** 3. INICIO DEL PROGRAMA: Carga Asíncrona (PIXI.Assets) **
-// ===========================================================
 
 async function loadGoatAssets() {
   const manifest = {
@@ -639,14 +621,7 @@ async function loadGoatAssets() {
   try {
     await PIXI.Assets.init({ manifest: manifest });
     const resources = await PIXI.Assets.loadBundle("goatBundle");
-
-    console.log(
-      "[OVEJAS] PIXI.Assets.loadBundle returned. resources keys:",
-      Object.keys(resources)
-    );
-
     let success = true;
-    console.log("[OVEJAS] Texturas cargadas correctamente. Creando flock...");
 
     // Procesamos todas las assets del bundle (tanto beige como black)
     Object.keys(manifest.bundles[0].assets).forEach((s) => {
@@ -665,39 +640,26 @@ async function loadGoatAssets() {
         }
       } else {
         success = false;
-        console.error(
-          `Error: El archivo JSON ${s}.json se cargó, pero no contiene la estructura de frames esperada.`
-        );
       }
     });
 
     if (success) {
       createFlock();
-      // Crear 6 ovejas negras móviles en posiciones aleatorias
       createStaticBlackSheep(8);
       // Actualizar HUD después de crear entidades
       if (typeof window.updateCounters === "function") {
         window.updateCounters(flock.length, staticSheep.length);
       }
-      console.log(
-        "¡Éxito! 🎉 La simulación Boid con cabras animadas ha comenzado."
-      );
-    } else {
-      console.error(
-        "🔴 No se pudo iniciar la simulación. El problema es la estructura interna de los JSON (verifique el objeto 'frames' en el JSON)."
-      );
     }
   } catch (error) {
-    console.error("⛔ ERROR CRÍTICO DURANTE LA CARGA DE ASSETS.", error);
+    console.error("Error durante la carga de assets", error);
   }
 }
 
-// ⚠️ EJECUCIÓN ⚠️
+// ejecucion
 loadGoatAssets();
 
-// =====================================================
 // ** 4. OVEJAS NEGRAS ESTÁTICAS (CREACIÓN Y HELPERS) **
-// =====================================================
 
 function createStaticBlackSheep(count = 6) {
   if (!loadedTextures["goat_black_s"]) {
@@ -750,9 +712,9 @@ function createMovingBlackSheep(x, y) {
   // Parámetros de movimiento circular y errático
   const center = { x: x, y: y };
   let angle = Math.random() * Math.PI * 2;
-  const radius = 4 + Math.random() * 6; // radio aún más pequeño
+  const radius = 4 + Math.random() * 6;
   let angularSpeed =
-    (Math.random() * 0.02 + 0.008) * (Math.random() < 0.5 ? -1 : 1); // más lento
+    (Math.random() * 0.02 + 0.008) * (Math.random() < 0.5 ? -1 : 1);
 
   const obj = {
     sprite,
@@ -771,7 +733,7 @@ function createMovingBlackSheep(x, y) {
         if (d < avoidRadius) {
           const ux = dx / d;
           const uy = dy / d;
-          const strength = ((avoidRadius - d) / avoidRadius) * 1.8; // magnitud de empuje
+          const strength = ((avoidRadius - d) / avoidRadius) * 1.8;
           center.x += ux * strength * 1.2;
           center.y += uy * strength * 1.2;
         }

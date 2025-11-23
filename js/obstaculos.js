@@ -1,4 +1,4 @@
-// ObstacleManager: registra obstáculos y resuelve colisiones círculo-rectángulo
+// registra obstáculos y resuelve colisiones círculo-rectángulo
 const ObstacleManager = (function () {
   const obstacles = [];
 
@@ -33,14 +33,12 @@ const ObstacleManager = (function () {
     };
   }
 
-  // resuelve colisión de un punto circular contra todos los obstáculos
-  // point: {x,y} (pasado por referencia) y radius: número
+  // resuelve colisión de un punto circular contra todos los obstáculos;  point: {x,y} (pasado por referencia) y radius: número
   function resolvePoint(point, radius = 12) {
     if (!point) return;
     for (let o of obstacles) {
       const r = getRect(o);
-      // Si este obstáculo permite pasar por detrás y el punto está suficientemente abajo
-      // permitimos la entrada (simula pasar por detrás de la casa/imagen).
+      // Si este obstáculo permite pasar por detrás y el punto está suficientemente abajo permitimos la entrada.
       const height = r.bottom - r.top || 1;
       const frac = (point.y - r.top) / height;
       if (o.allowPassBehind && frac >= (o.passThreshold || 0.66)) {
@@ -55,7 +53,7 @@ const ObstacleManager = (function () {
       const distSq = dx * dx + dy * dy;
       if (distSq < radius * radius) {
         const dist = Math.sqrt(distSq) || 0.0001;
-        const overlap = radius - dist + 0.5; // pequeño margen
+        const overlap = radius - dist + 0.5;
         const ux = dx / dist;
         const uy = dy / dist;
         // Si el centro está exactamente dentro del rect (dist muy pequeño), empujamos en dirección opuesta al centro del rect
@@ -100,8 +98,7 @@ const ObstacleManager = (function () {
         for (let p of pending) {
           addRectObstacle(p.sprite, p.padding || 0, p.options || {});
         }
-        // limpiamos la lista para evitar duplicados si se vuelve a ejecutar
-        window.pendingObstacles = [];
+        window.pendingObstacles = []; // limpiamos la lista para evitar duplicados si se vuelve a ejecutar
       }
     } catch (e) {
       console.warn("No se pudo registrar pendingObstacles:", e);

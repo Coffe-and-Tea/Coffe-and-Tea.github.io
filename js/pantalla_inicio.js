@@ -10,23 +10,20 @@
   console.log("[START SCREEN] Script initialized.");
 
   let startScreenContainer = null;
-  let screenShown = false;
+  let screenShown = false; // Crear la pantalla de inicio
 
-  // Crear la pantalla de inicio
   function createStartScreen() {
     if (startScreenContainer) return;
 
     startScreenContainer = new PIXI.Container();
-    startScreenContainer.zIndex = 100; // Agregar un zIndex alto como precaución
+    startScreenContainer.zIndex = 100; // Agregar un zIndex alto como precaución // Fondo negro que cubre toda la pantalla
 
-    // Fondo negro que cubre toda la pantalla
     const background = new PIXI.Graphics();
     background.beginFill(0x000000);
     background.drawRect(0, 0, pixiApp.renderer.width, pixiApp.renderer.height);
     background.endFill();
-    startScreenContainer.addChild(background);
+    startScreenContainer.addChild(background); // Estilo del título
 
-    // Estilo del título
     const titleStyle = new PIXI.TextStyle({
       fontFamily: "Special Elite",
       fontSize: 72,
@@ -34,16 +31,14 @@
       stroke: 0x000000,
       strokeThickness: 4,
       align: "center",
-    });
+    }); // Título "THE DEVIL'S HERD"
 
-    // Título "THE DEVIL'S HERD"
     const title = new PIXI.Text("THE DEVIL'S HERD", titleStyle);
     title.anchor.set(0.5);
     title.x = pixiApp.renderer.width / 2;
     title.y = pixiApp.renderer.height / 2 - 150;
-    startScreenContainer.addChild(title);
+    startScreenContainer.addChild(title); // Estilo del botón
 
-    // Estilo del botón
     const buttonTextStyle = new PIXI.TextStyle({
       fontFamily: "Special Elite",
       fontSize: 48,
@@ -54,9 +49,8 @@
     });
 
     const buttonText = new PIXI.Text("COMENZAR", buttonTextStyle);
-    buttonText.anchor.set(0.5);
+    buttonText.anchor.set(0.5); // Fondo del botón (blanco)
 
-    // Fondo del botón (blanco)
     const button = new PIXI.Graphics();
     const buttonPadding = 30;
     const buttonWidth = buttonText.width + 2 * buttonPadding;
@@ -70,27 +64,24 @@
       buttonHeight,
       15
     );
-    button.endFill();
+    button.endFill(); // Hacer el botón interactivo (CORRECCIÓN DE DEPRECACIÓN)
 
-    // Hacer el botón interactivo
-    button.interactive = true;
-    button.buttonMode = true;
+    button.eventMode = "static"; // Reemplaza button.interactive = true;
+    button.cursor = "pointer"; // Reemplaza button.buttonMode = true;
     button.on("pointerdown", () => {
       console.log("[START SCREEN] COMENZAR button pressed. Starting game...");
       hideStartScreen();
       startGame();
-    });
+    }); // Posicionar botón
 
-    // Posicionar botón
     button.x = pixiApp.renderer.width / 2;
     button.y = pixiApp.renderer.height / 2 + 100;
     buttonText.x = pixiApp.renderer.width / 2;
     buttonText.y = pixiApp.renderer.height / 2 + 100;
 
     startScreenContainer.addChild(button);
-    startScreenContainer.addChild(buttonText);
+    startScreenContainer.addChild(buttonText); // Agregar contenedor al stage
 
-    // Agregar contenedor al stage
     pixiApp.stage.addChild(startScreenContainer);
     console.log("[START SCREEN] Start screen created.");
   }
@@ -100,8 +91,7 @@
       createStartScreen();
     }
     if (startScreenContainer) {
-      startScreenContainer.visible = true;
-      // Esto asegura que se dibuje encima de todos los demás elementos.
+      startScreenContainer.visible = true; // Esto asegura que se dibuje encima de todos los demás elementos.
       pixiApp.stage.setChildIndex(
         startScreenContainer,
         pixiApp.stage.children.length - 1
@@ -125,9 +115,8 @@
       window.gameTimer.start();
       console.log("[START SCREEN] Game timer started.");
     }
-  }
+  } // Exponer funciones globales
 
-  // Exponer funciones globales
   window.showStartScreen = showStartScreen;
   window.hideStartScreen = hideStartScreen;
   window.startGame = startGame;
