@@ -823,6 +823,26 @@ function createMovingBlackSheep(x, y) {
           }
         } catch (e) {}
       }
+      // Restringe la posición central de la oveja negra al mundo.
+      const screenWidth =
+        typeof WORLD_WIDTH !== "undefined" ? WORLD_WIDTH : app.screen.width;
+      const screenHeight =
+        typeof WORLD_HEIGHT !== "undefined" ? WORLD_HEIGHT : app.screen.height;
+      const halfSize = 16; // Margen de seguridad para que no toque el borde
+
+      // Clamp center X
+      if (center.x < halfSize) {
+        center.x = halfSize;
+      } else if (center.x > screenWidth - halfSize) {
+        center.x = screenWidth - halfSize;
+      }
+
+      // Clamp center Y
+      if (center.y < halfSize) {
+        center.y = halfSize;
+      } else if (center.y > screenHeight - halfSize) {
+        center.y = screenHeight - halfSize;
+      }
     },
     removeSelf() {
       try {

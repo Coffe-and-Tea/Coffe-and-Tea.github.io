@@ -1,6 +1,6 @@
 // temporizador.js (PIXI HUD)
 
-const tiempo_inicial = 80; // 30s primera fase + 50s segunda fase
+const tiempo_inicial = 120; // 30s primera fase + 50s segunda fase
 let timeLeft = tiempo_inicial;
 let timerInterval = null;
 let pixiTimerText = null;
@@ -64,7 +64,7 @@ function updatePixiDisplay() {
   // Primera fase: parpadea cuando 60 > timeLeft >= 50 (últimos 10s de primera fase)
   // Segunda fase: parpadea cuando 10 > timeLeft >= 0 (últimos 10s de segunda fase)
 
-  if ((timeLeft <= 60 && timeLeft > 50) || (timeLeft <= 10 && timeLeft > 0)) {
+  if ((timeLeft <= 80 && timeLeft > 70) || (timeLeft <= 10 && timeLeft > 0)) {
     // parpadeo entre rojo y blanco en los últimos 10 segundos de cada fase
     blinkState = !blinkState;
     pixiTimerText.style.fill = blinkState ? "#ff0000" : "#ffffff";
@@ -117,11 +117,11 @@ function tick() {
     }
   }
 
-  // Cuando faltan exactamente 50s (después de la primera fase), convertir 1/4 de blancas
-  if (timeLeft === 50 && !firstPhaseConverted) {
+  // Cuando faltan exactamente 50s (después de la primera fase), convertir 1/6 de blancas
+  if (timeLeft === 70 && !firstPhaseConverted) {
     firstPhaseConverted = true;
     if (typeof window.convertFractionWhiteToBlack === "function") {
-      window.convertFractionWhiteToBlack(1 / 4);
+      window.convertFractionWhiteToBlack(1 / 6);
       console.log(
         "Primera fase completada. 1/4 de ovejas blancas convertidas a negras."
       );
