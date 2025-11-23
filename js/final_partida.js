@@ -269,8 +269,8 @@
 
     // 2. Botón "JUGAR DE NUEVO"
     const BUTTON_STYLE = Object.assign({}, GAME_OVER_TEXT_STYLE, {
-      fill: 0x000000, // Color de texto NEGRO
-      stroke: 0xffffff, // Borde blanco
+      fill: 0x000000,
+      stroke: 0xffffff,
       strokeThickness: 2,
       fontSize: 24,
     });

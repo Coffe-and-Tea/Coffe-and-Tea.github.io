@@ -68,14 +68,33 @@ for (let i = 0; i < 4; i++) {
   piedras.push(r);
 }
 
+const vallasHorizontales = [];
+const vallasPositions = [
+  { x: WORLD_WIDTH * 0.25, y: WORLD_HEIGHT * 0.6 },
+  { x: WORLD_WIDTH * 0.6, y: WORLD_HEIGHT * 0.35 },
+  { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.75 },
+  { x: WORLD_WIDTH * 0.58, y: WORLD_HEIGHT * 0.56 },
+];
+
+for (let i = 0; i < 4; i++) {
+  // Usamos el nombre de imagen que proporcionaste, asumiendo que es correcto
+  const r = PIXI.Sprite.from("images/valla_h.png");
+  r.width = 90;
+  r.height = (r.width * 0.7) | 0;
+  r.anchor.set(0.5);
+  // Aplica el ligero desplazamiento aleatorio que definiste
+  r.x = vallasPositions[i].x + (Math.random() - 0.5) * 80;
+  r.y = vallasPositions[i].y + (Math.random() - 0.5) * 60;
+  world.addChild(r);
+  vallasHorizontales.push(r);
+}
+
 // --- Creación de la ÚNICA Casa ---
 const casa = [];
 // Solo hay una posición central definida
 const casaPositions = [{ x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.4 }];
-
-// **IMPORTANTE: Se elimina el bucle 'for (let i = 0; i < 3; i++)'**
 const c = PIXI.Sprite.from("images/granja_abandonada.png");
-c.width = 300 + Math.random() * 40;
+c.width = 300;
 c.height = (c.width * 0.9) | 0;
 c.anchor.set(0.5);
 
@@ -87,8 +106,6 @@ world.addChild(c);
 casa.push(c);
 
 // 2. REGISTRO DE OBSTÁCULOS (Barreras sólidas)
-// =======================================================================
-
 // Concatenamos las rocas y la única casa.
 const todosLosObstaculos = [...piedras, ...casa];
 

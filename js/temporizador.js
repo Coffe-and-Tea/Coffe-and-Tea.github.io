@@ -121,7 +121,7 @@ function tick() {
   if (timeLeft === 70 && !firstPhaseConverted) {
     firstPhaseConverted = true;
     if (typeof window.convertFractionWhiteToBlack === "function") {
-      window.convertFractionWhiteToBlack(1 / 6);
+      window.convertFractionWhiteToBlack(1 / 8);
       console.log(
         "Primera fase completada. 1/4 de ovejas blancas convertidas a negras."
       );

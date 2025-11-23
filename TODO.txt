@@ -6,17 +6,17 @@ Cosas por terminar/ implementar:
         - Acomodar animacion (le falta el pocho y la sombra).
 
     Animales:
-        - Agregar animaciones basicas de movimiento.        ✅
-        - Implemenar mecanica de muerte.                    ✅
-        - Implemenar movimiento boid (grupos).              ✅
-        - Implemenar movimiento pausado (encarnados).       ✅
-        - Hacer que las obejas negras se muevan y aparezcan en todo el mapa. 
+        - Agregar animaciones basicas de movimiento.                            ✅
+        - Implemenar mecanica de muerte.                                        ✅
+        - Implemenar movimiento boid (grupos).                                  ✅
+        - Implemenar movimiento pausado (encarnados).                           ✅
+        - Hacer que las obejas negras se muevan y aparezcan en todo el mapa.    ✅
 
     Obstaculos:
         - vallas (opcional).
         - fardos (opcional).
         - rocas  (opcional). ✅
-        - granja.            ✅ --> armar colisiones
+        - granja.            ✅ --> armar colisiones ✅
 
     UI:
         - Agregar vision restringida alrededor de la granjera.
@@ -30,7 +30,7 @@ Cosas por terminar/ implementar:
 
     Pantallas: 
         - Inicio: - Agregar iamgen con tuto.
-                  - Boton de comenzar.       ✅
+                  - Boton de comenzar.        ✅
 
         - Final: - Que la granjera se quede quieta cuando se pone la pantalla en negro cuando pierde.            ✅
                  - Cuando gana que la pantalla se ponga en negro y salga un cartel de ganaste y jugar de nuevo.  ✅
@@ -43,12 +43,9 @@ Cosas por terminar/ implementar:
     Extras:
         - Actualizar GDD.
         - Menu boton pausa.
-        - ReadMe github (breve sinopsis).
+        - ReadMe github (breve sinopsis).               ✅
         - Arreglar botones (esteticamente hablando).
 
-    A modificar:
-         - final_partida_ganada:
-            - Borrar 
 
 
 

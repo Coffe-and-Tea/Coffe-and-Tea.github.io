@@ -73,8 +73,8 @@
     // 2. Botón "JUGAR DE NUEVO"
     const BUTTON_STYLE = Object.assign({}, WIN_TEXT_STYLE, {
       fontSize: 24,
-      fill: 0x000000, // Texto negro
-      stroke: 0xffffff, // Borde blanco
+      fill: 0x000000,
+      stroke: 0xffffff,
       strokeThickness: 2,
     });
 
@@ -117,13 +117,12 @@
     winContainer.y = pixiApp.renderer.height / 2;
 
     pixiApp.stage.addChild(winContainer);
-    console.log("[WIN CONTROLLER] UI de Victoria creada y mostrada.");
   }
 
   // --- 2. Lógica de Verificación y Ticker de Juego ---
 
   pixiApp.ticker.add(() => {
-    // --- A) Controlar la atenuación (Fade) ---
+    // A) Controlar la atenuación (Fade)
     if (fadingIn) {
       overlayAlpha += fadeInSpeed;
 
@@ -147,12 +146,10 @@
       }
       overlay.alpha = overlayAlpha;
       pixiApp.stage.setChildIndex(overlay, pixiApp.stage.children.length - 1);
-      return; // Detener el resto de la lógica si estamos en fade
+      return;
     }
 
-    // --- B) Verificar Condición de Victoria ---
-    // Asumiendo que 'timerValue' es el tiempo restante en SEGUNDOS (0 cuando llega a 00:00:00)
-    // Y que 'blackSheepCount' es el número de ovejas negras restantes
+    // Verificar Condición de Victoria
     const timerFinished = typeof timerValue !== "undefined" && timerValue <= 0;
     const allBlackSheepFound =
       typeof blackSheepCount !== "undefined" && blackSheepCount <= 0;
@@ -165,8 +162,6 @@
 
       // Iniciar la atenuación
       fadingIn = true;
-      // Opcional: Detener la lógica de tu juego principal aquí si es necesario
-      // pixiApp.ticker.stop();
     }
   });
 
