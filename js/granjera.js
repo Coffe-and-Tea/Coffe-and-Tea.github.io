@@ -240,7 +240,7 @@ function getAttackAnimKey() {
 // Gameloop para el movimiento, animación y la INTERACCIÓN DE MATANZA
 function gameloop() {
   let moving = false;
-  const speed = 3;
+  const speed = 4;
   let currentAnimKey = null;
 
   let movedX = false;

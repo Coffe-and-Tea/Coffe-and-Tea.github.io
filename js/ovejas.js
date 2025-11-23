@@ -1,5 +1,5 @@
 // Configuración global y referencias
-const numGoats = 90;
+const numGoats = 140;
 const flock = [];
 const loadedTextures = {}; // Almacena los frames de animación cargados
 console.log("ovejas.js cargado. numGoats=", numGoats);
@@ -47,7 +47,7 @@ if (typeof window.setInitialSheepCreated !== "function") {
 }
 
 // =========================================================
-// **  1. CLASE GOATBOID (Boid con Animación Direccional) **
+// **  1. CLASE GOATBOID (Boid con Animación Direccional) **
 // =========================================================
 
 class GoatBoid {
@@ -437,7 +437,7 @@ class GoatBoid {
 }
 
 // ==============================================
-// **  2. FUNCIONES DE CARGA E INICIALIZACIÓN  **
+// **  2. FUNCIONES DE CARGA E INICIALIZACIÓN  **
 // ==============================================
 
 function createFlock() {
@@ -789,8 +789,22 @@ function createMovingBlackSheep(x, y) {
       this.sprite.x = center.x + Math.cos(this.angle) * this.radius;
       this.sprite.y = center.y + Math.sin(this.angle) * this.radius;
       // Limitar dentro de la pantalla
-      const sw = app.screen.width;
-      const sh = app.screen.height;
+      // const sw = app.screen.width;
+      // const sh = app.screen.height;
+
+      // ******* INICIO DE LA MODIFICACIÓN *******
+      // Se elimina la restricción de borde (clamp) sobre el centro (center)
+      // para permitir que la oveja negra pueda "vagabundear" por todo el escenario.
+
+      /*
+      // clamp center to screen
+      if (center.x < 8) center.x = 8;
+      if (center.y < 8) center.y = 8;
+      if (center.x > sw - 8) center.x = sw - 8;
+      if (center.y > sh - 8) center.y = sh - 8;
+      */
+      // ******* FIN DE LA MODIFICACIÓN *******
+
       // ajustar center si sprite colisiona contra bordes u obstáculos
       if (typeof ObstacleManager !== "undefined") {
         const p = { x: this.sprite.x, y: this.sprite.y };
@@ -809,11 +823,6 @@ function createMovingBlackSheep(x, y) {
           }
         } catch (e) {}
       }
-      // clamp center to screen
-      if (center.x < 8) center.x = 8;
-      if (center.y < 8) center.y = 8;
-      if (center.x > sw - 8) center.x = sw - 8;
-      if (center.y > sh - 8) center.y = sh - 8;
     },
     removeSelf() {
       try {
@@ -825,6 +834,7 @@ function createMovingBlackSheep(x, y) {
       const idx = staticSheep.indexOf(this);
       if (idx !== -1) staticSheep.splice(idx, 1);
     },
+    position: center, // Añadido para que las cabras beige puedan acceder a su posición
   };
 
   staticSheep.push(obj);
