@@ -46,42 +46,64 @@ background.x = 0;
 background.y = 0;
 world.addChild(background);
 
-// Agregamos una granja al mundo
-const farm = PIXI.Sprite.from("images/granja_abandonada.png");
-farm.width = 600;
-farm.height = 320;
-farm.anchor.set(0.5);
-farm.x = WORLD_WIDTH / 2;
-farm.y = WORLD_HEIGHT / 2;
-world.addChild(farm);
-
-// Nota: placeholder 'piedra' removido; se crearán varias rocas más abajo
-// Crear 3 rocas distribuidas por el mapa y registrarlas como obstáculos
+// --- Creación de las 4 Rocas en posiciones Fijas ---
 const piedras = [];
 const rockPositions = [
   { x: WORLD_WIDTH * 0.25, y: WORLD_HEIGHT * 0.6 },
   { x: WORLD_WIDTH * 0.6, y: WORLD_HEIGHT * 0.35 },
   { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.75 },
+  { x: WORLD_WIDTH * 0.58, y: WORLD_HEIGHT * 0.56 },
 ];
 
-for (let i = 0; i < 3; i++) {
+for (let i = 0; i < 4; i++) {
+  // Usamos el nombre de imagen que proporcionaste, asumiendo que es correcto
   const r = PIXI.Sprite.from("images/piedra.png");
   r.width = 90 + Math.random() * 40;
   r.height = (r.width * 0.7) | 0;
   r.anchor.set(0.5);
+  // Aplica el ligero desplazamiento aleatorio que definiste
   r.x = rockPositions[i].x + (Math.random() - 0.5) * 80;
   r.y = rockPositions[i].y + (Math.random() - 0.5) * 60;
   world.addChild(r);
   piedras.push(r);
 }
 
-// Registrar las rocas como obstáculos en pendingObstacles para que ObstacleManager las añada
+// --- Creación de la ÚNICA Casa ---
+const casa = [];
+// Solo hay una posición central definida
+const casaPositions = [{ x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.4 }];
+
+// **IMPORTANTE: Se elimina el bucle 'for (let i = 0; i < 3; i++)'**
+const c = PIXI.Sprite.from("images/granja_abandonada.png");
+c.width = 300 + Math.random() * 40;
+c.height = (c.width * 0.9) | 0;
+c.anchor.set(0.5);
+
+// Posicionar la única casa en la posición central, aplicando el desplazamiento
+c.x = casaPositions[0].x + (Math.random() - 0.5) * 80;
+c.y = casaPositions[0].y + (Math.random() - 0.5) * 60;
+
+world.addChild(c);
+casa.push(c);
+
+// 2. REGISTRO DE OBSTÁCULOS (Barreras sólidas)
+// =======================================================================
+
+// Concatenamos las rocas y la única casa.
+const todosLosObstaculos = [...piedras, ...casa];
+
+// Aseguramos que el array de obstáculos a registrar exista.
 window.pendingObstacles = window.pendingObstacles || [];
-for (let r of piedras) {
+
+// Registramos todos los elementos como obstáculos sólidos.
+for (let r of todosLosObstaculos) {
   window.pendingObstacles.push({
     sprite: r,
     padding: 6,
-    options: { allowPassBehind: false },
+    options: {
+      // Mantener como false para que actúen como paredes sólidas
+      allowPassBehind: false,
+    },
   });
 }
 
