@@ -46,7 +46,7 @@ background.x = 0;
 background.y = 0;
 world.addChild(background);
 
-// Obstáculos del mundo: piedras, vallas y una casa abandonada
+// --- OBSTÁCULOS: Rocas ---
 const piedras = [];
 const rockPositions = [
   { x: WORLD_WIDTH * 0.25, y: WORLD_HEIGHT * 0.6 },
@@ -66,27 +66,7 @@ for (let i = 0; i < 4; i++) {
   piedras.push(r);
 }
 
-// const vallasHorizontales = [];
-// const vallasPositions = [
-//   { x: WORLD_WIDTH * 0.25, y: WORLD_HEIGHT * 0.6 },
-//   { x: WORLD_WIDTH * 0.6, y: WORLD_HEIGHT * 0.35 },
-//   { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.75 },
-//   { x: WORLD_WIDTH * 0.58, y: WORLD_HEIGHT * 0.56 },
-// ];
-
-// for (let i = 0; i < 4; i++) {
-//   // Usamos el nombre de imagen que proporcionaste, asumiendo que es correcto
-//   const r = PIXI.Sprite.from("images/valla_h.png");
-//   r.width = 90;
-//   r.height = (r.width * 0.7) | 0;
-//   r.anchor.set(0.5);
-//   // Aplica el ligero desplazamiento aleatorio que definiste
-//   r.x = vallasPositions[i].x + (Math.random() - 0.5) * 80;
-//   r.y = vallasPositions[i].y + (Math.random() - 0.5) * 60;
-//   world.addChild(r);
-//   vallasHorizontales.push(r);
-// }
-
+// --- OBSTÁCULOS: Casa Abandonada ---
 const casa = [];
 const casaPositions = [{ x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.35 }];
 const c = PIXI.Sprite.from("images/granja_abandonada.png");
@@ -99,7 +79,68 @@ c.y = casaPositions[0].y;
 world.addChild(c);
 casa.push(c);
 
-const todosLosObstaculos = [...piedras, ...casa];
+// --- OBSTÁCULOS: Vallas Horizontales ---
+const vallasHorizontales = [];
+// Posiciones para vallas horizontales (no se superponen con rocas/casa)
+const hFencePositions = [
+  { x: WORLD_WIDTH * 0.1, y: WORLD_HEIGHT * 0.25 },
+  { x: WORLD_WIDTH * 0.35, y: WORLD_HEIGHT * 0.1 },
+  { x: WORLD_WIDTH * 0.75, y: WORLD_HEIGHT * 0.9 },
+  { x: WORLD_WIDTH * 0.15, y: WORLD_HEIGHT * 0.8 },
+];
+
+// Tamaño distinto para vallas horizontales
+const H_FENCE_WIDTH = 120;
+const H_FENCE_HEIGHT = 40;
+
+for (const pos of hFencePositions) {
+  const valla = PIXI.Sprite.from("images/valla_h.png");
+  valla.width = H_FENCE_WIDTH;
+  valla.height = H_FENCE_HEIGHT;
+  valla.anchor.set(0.5);
+  // Aplica un ligero desplazamiento aleatorio
+  valla.x = pos.x + (Math.random() - 0.5) * 40;
+  valla.y = pos.y + (Math.random() - 0.5) * 30;
+
+  world.addChild(valla);
+  vallasHorizontales.push(valla);
+}
+
+// --- OBSTÁCULOS: Vallas Verticales ---
+const vallasVerticales = [];
+// Posiciones para vallas verticales (no se superponen con rocas/casa)
+const vFencePositions = [
+  { x: WORLD_WIDTH * 0.9, y: WORLD_HEIGHT * 0.4 },
+  { x: WORLD_WIDTH * 0.3, y: WORLD_HEIGHT * 0.45 },
+  { x: WORLD_WIDTH * 0.65, y: WORLD_HEIGHT * 0.65 },
+  { x: WORLD_WIDTH * 0.4, y: WORLD_HEIGHT * 0.95 },
+];
+
+// Tamaño distinto para vallas verticales
+const V_FENCE_WIDTH = 40;
+const V_FENCE_HEIGHT = 120;
+
+for (const pos of vFencePositions) {
+  const valla = PIXI.Sprite.from("images/valla_v.png");
+  valla.width = V_FENCE_WIDTH;
+  valla.height = V_FENCE_HEIGHT;
+  valla.anchor.set(0.5);
+  // Aplica un ligero desplazamiento aleatorio
+  valla.x = pos.x + (Math.random() - 0.5) * 30;
+  valla.y = pos.y + (Math.random() - 0.5) * 40;
+
+  world.addChild(valla);
+  vallasVerticales.push(valla);
+}
+
+// --- REGISTRO DE OBSTÁCULOS PARA COLISIÓN ---
+// Incluimos rocas, casa, Vallas Horizontales Y Vallas Verticales
+const todosLosObstaculos = [
+  ...piedras,
+  ...casa,
+  ...vallasHorizontales,
+  ...vallasVerticales, // ¡Ambos tipos de vallas son ahora obstáculos colisionables!
+];
 
 // Aseguramos que el array de obstáculos a registrar exista.
 window.pendingObstacles = window.pendingObstacles || [];
