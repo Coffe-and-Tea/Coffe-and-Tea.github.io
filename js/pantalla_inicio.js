@@ -7,8 +7,6 @@
     return;
   }
 
-  console.log("[START SCREEN] Script initialized.");
-
   let startScreenContainer = null;
   let screenShown = false; // Crear la pantalla de inicio
 
@@ -69,7 +67,6 @@
     button.eventMode = "static"; // Reemplaza button.interactive = true;
     button.cursor = "pointer"; // Reemplaza button.buttonMode = true;
     button.on("pointerdown", () => {
-      console.log("[START SCREEN] COMENZAR button pressed. Starting game...");
       hideStartScreen();
       startGame();
     }); // Posicionar botón
@@ -83,7 +80,6 @@
     startScreenContainer.addChild(buttonText); // Agregar contenedor al stage
 
     pixiApp.stage.addChild(startScreenContainer);
-    console.log("[START SCREEN] Start screen created.");
   }
 
   function showStartScreen() {
@@ -97,7 +93,6 @@
         pixiApp.stage.children.length - 1
       );
       screenShown = true;
-      console.log("[START SCREEN] Start screen shown and moved to front.");
     }
   }
 
@@ -105,7 +100,6 @@
     if (startScreenContainer) {
       startScreenContainer.visible = false;
       screenShown = false;
-      console.log("[START SCREEN] Start screen hidden.");
     }
   }
 
@@ -113,10 +107,10 @@
     // Iniciar el temporizador
     if (typeof window.gameTimer !== "undefined" && window.gameTimer.start) {
       window.gameTimer.start();
-      console.log("[START SCREEN] Game timer started.");
     }
-  } // Exponer funciones globales
+  }
 
+  // Exponer funciones globales
   window.showStartScreen = showStartScreen;
   window.hideStartScreen = hideStartScreen;
   window.startGame = startGame;
