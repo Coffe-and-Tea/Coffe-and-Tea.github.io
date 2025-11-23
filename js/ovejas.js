@@ -1,5 +1,5 @@
 // Configuración global y referencias
-const numGoats = 140;
+const numGoats = 170;
 const flock = [];
 const loadedTextures = {}; // Almacena los frames de animación cargados
 console.log("ovejas.js cargado. numGoats=", numGoats);

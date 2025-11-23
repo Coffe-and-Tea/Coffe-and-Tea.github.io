@@ -83,6 +83,12 @@ function tick() {
     timeLeft = 0;
     updatePixiDisplay();
 
+    // 1. **Control de Sangre al llegar a 0**
+    if (typeof window.bloodEffectActive !== "undefined") {
+      window.bloodEffectActive = false; // Detener el titileo
+      window.bloodMaxStatic = true; // Activar opacidad máxima fija
+    }
+
     // Al terminar los 60s totales:
     // 1. Convertir todas las ovejas blancas restantes a negras
     if (typeof window.convertFractionWhiteToBlack === "function") {
@@ -100,6 +106,15 @@ function tick() {
       );
     }
     return;
+  }
+
+  // HUD - sangre
+  if (typeof window.bloodEffectActive !== "undefined") {
+    if (timeLeft <= 10) {
+      window.bloodEffectActive = true;
+    } else {
+      window.bloodEffectActive = false;
+    }
   }
 
   // Cuando faltan exactamente 50s (después de la primera fase), convertir 1/4 de blancas
@@ -123,6 +138,12 @@ function startTimer() {
   timeLeft = tiempo_inicial;
   firstPhaseConverted = false;
   updatePixiDisplay();
+
+  // HUD - sangre
+  if (typeof window.bloodEffectActive !== "undefined") {
+    window.bloodEffectActive = false;
+    window.bloodMaxStatic = false;
+  }
 
   // Activar el flag de juego comenzado para permitir detección de victoria
   if (typeof window.setGameStarted === "function") {
