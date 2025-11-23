@@ -68,26 +68,26 @@ for (let i = 0; i < 4; i++) {
   piedras.push(r);
 }
 
-const vallasHorizontales = [];
-const vallasPositions = [
-  { x: WORLD_WIDTH * 0.25, y: WORLD_HEIGHT * 0.6 },
-  { x: WORLD_WIDTH * 0.6, y: WORLD_HEIGHT * 0.35 },
-  { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.75 },
-  { x: WORLD_WIDTH * 0.58, y: WORLD_HEIGHT * 0.56 },
-];
+// const vallasHorizontales = [];
+// const vallasPositions = [
+//   { x: WORLD_WIDTH * 0.25, y: WORLD_HEIGHT * 0.6 },
+//   { x: WORLD_WIDTH * 0.6, y: WORLD_HEIGHT * 0.35 },
+//   { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.75 },
+//   { x: WORLD_WIDTH * 0.58, y: WORLD_HEIGHT * 0.56 },
+// ];
 
-for (let i = 0; i < 4; i++) {
-  // Usamos el nombre de imagen que proporcionaste, asumiendo que es correcto
-  const r = PIXI.Sprite.from("images/valla_h.png");
-  r.width = 90;
-  r.height = (r.width * 0.7) | 0;
-  r.anchor.set(0.5);
-  // Aplica el ligero desplazamiento aleatorio que definiste
-  r.x = vallasPositions[i].x + (Math.random() - 0.5) * 80;
-  r.y = vallasPositions[i].y + (Math.random() - 0.5) * 60;
-  world.addChild(r);
-  vallasHorizontales.push(r);
-}
+// for (let i = 0; i < 4; i++) {
+//   // Usamos el nombre de imagen que proporcionaste, asumiendo que es correcto
+//   const r = PIXI.Sprite.from("images/valla_h.png");
+//   r.width = 90;
+//   r.height = (r.width * 0.7) | 0;
+//   r.anchor.set(0.5);
+//   // Aplica el ligero desplazamiento aleatorio que definiste
+//   r.x = vallasPositions[i].x + (Math.random() - 0.5) * 80;
+//   r.y = vallasPositions[i].y + (Math.random() - 0.5) * 60;
+//   world.addChild(r);
+//   vallasHorizontales.push(r);
+// }
 
 // --- Creación de la ÚNICA Casa ---
 const casa = [];
