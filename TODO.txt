@@ -1,4 +1,4 @@
-Cosas por terminar/ implementar:
+Cosas por terminar/implementar:
     Granjera:
         - Ordenar el codigo de granjera. 
         - Agregar animaciones de ataque.                        ✅
@@ -13,10 +13,10 @@ Cosas por terminar/ implementar:
         - Hacer que las obejas negras se muevan y aparezcan en todo el mapa.    ✅
 
     Obstaculos:
-        - vallas (opcional).
+        - vallas (opcional).    (en proceso)
         - fardos (opcional).
-        - rocas  (opcional). ✅
-        - granja.            ✅ --> armar colisiones ✅
+        - rocas  (opcional).    ✅
+        - granja.               ✅ --> armar colisiones ✅
 
     UI:
         - Agregar vision restringida alrededor de la granjera.
@@ -30,14 +30,14 @@ Cosas por terminar/ implementar:
 
     Pantallas: 
         - Inicio: - Agregar iamgen con tuto.
-                  - Boton de comenzar.        ✅
+                  - Boton de comenzar.          ✅
 
         - Final: - Que la granjera se quede quieta cuando se pone la pantalla en negro cuando pierde.            ✅
                  - Cuando gana que la pantalla se ponga en negro y salga un cartel de ganaste y jugar de nuevo.  ✅
 
     Tutorial:
         - Pantallas de lore.
-        - Pantallas de controles.
+        - Pantallas de controles.      ✅
         - Implementarlas.
         
     Extras:

@@ -33,7 +33,6 @@ if (typeof app !== "undefined") {
 // Animación del efecto de sangre
 if (typeof app !== "undefined") {
   app.ticker.add(() => {
-    // *** NUEVA LÓGICA: Si el estado estático está activo, forzar el alpha máximo ***
     if (window.bloodMaxStatic) {
       sangre.alpha = bloodMaxOpacity;
       return; // Detener la ejecución del titileo

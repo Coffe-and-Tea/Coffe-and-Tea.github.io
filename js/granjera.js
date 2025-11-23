@@ -28,7 +28,6 @@ let lastScaleX = 1;
 let isAttacking = false;
 
 // Agregamos un sprite estatico (usado como fallback si falla la carga o el idle)
-// *** RUTA CORREGIDA: granjera.png está dentro de la carpeta 'images/' ***
 const granjera = PIXI.Sprite.from("images/granjera.png");
 granjera.anchor.set(0.5);
 granjera.x = characterPos.x;
@@ -41,7 +40,6 @@ else app.stage.addChild(granjera);
 let keys = {};
 const animSprites = {}; // Para guardar las animaciones
 
-// ** NUEVOS PARÁMETROS DE INTERACCIÓN **
 const KILL_KEY_CODE = 32; // Código de tecla para matar (32 es la barra espaciadora)
 const KILL_RADIUS = 40; // Distancia máxima en píxeles para que la granjera pueda interactuar/matar
 const FARMER_RADIUS = 24; // Radio aproximado para evitar obstaculos
@@ -77,7 +75,7 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
       `[Carga Fallida] El JSON para ${keyName} está incompleto o mal formado (falta 'animations').`
     );
     return;
-  } // Intentamos encontrar la lista de frames: 'walk', 'idle', o la primera lista disponible
+  }
 
   let animList =
     sheetData.animations.walk ||
@@ -96,8 +94,9 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
       `[Carga Crítica] No se encontró una lista de frames válida (walk/idle/otra) en el JSON de ${keyName}.`
     );
     return;
-  } // --- Lógica de creación del AnimatedSprite ---
+  }
 
+  // Lógica de creación del AnimatedSprite
   const baseTex = PIXI.BaseTexture.from(baseImagePath);
   const frames = animList
     .map((name) => {
@@ -155,7 +154,7 @@ const sheets = [
   "idle3", // Reposo Abajo
   "idle4", // Reposo Derecha
   "attack1", // ATAQUE Arriba
-  "attack2", // ATAQUE Izquierda/Derecha (Ahora usado para ambos)
+  "attack2", // ATAQUE Izquierda/Derecha
   "attack3", // ATAQUE Abajo
 ];
 
@@ -164,14 +163,12 @@ if (
   PIXI.Loader.shared &&
   typeof PIXI.Loader.shared.add === "function"
 ) {
-  // *** RUTA CORREGIDA: Los JSON están dentro de la carpeta 'animaciones/' ***
   sheets.forEach((s) => PIXI.Loader.shared.add(s, `animaciones/${s}.json`));
   PIXI.Loader.shared.load((loader, resources) => {
     sheets.forEach((s) => {
       const res = resources[s];
       if (res && res.data) {
         // Acceso seguro a la ruta de la imagen: Asume s.png si el meta.image falla
-        // *** RUTA CORREGIDA: Las imágenes PNG también están dentro de 'animaciones/' ***
         const baseImage =
           res.data.meta && res.data.meta.image
             ? `animaciones/${res.data.meta.image}`
@@ -188,7 +185,6 @@ if (
 } else {
   // Fallback: fetch cada JSON
   sheets.forEach((s) => {
-    // *** RUTA CORREGIDA: Los JSON y PNG están dentro de la carpeta 'animaciones/' ***
     fetch(`animaciones/${s}.json`)
       .then((r) => r.json())
       .then((json) => {
@@ -244,18 +240,19 @@ function gameloop() {
   let currentAnimKey = null;
 
   let movedX = false;
-  let movedY = false; // 1. --- LÓGICA DE ATAQUE (Prioridad Máxima) ---
+  let movedY = false;
 
+  // 1. LÓGICA DE ATAQUE (Prioridad Máxima)
   if (keys[KILL_KEY_CODE] && !isAttacking && typeof flock !== "undefined") {
     isAttacking = true;
     keys[KILL_KEY_CODE] = false; // Consumir la pulsación para que no sea automático
     currentAnimKey = getAttackAnimKey(); // Ejecutar lógica de eliminación solo al inicio del ataque
 
     performKillLogic();
-  } // Si estamos atacando, no se permite el movimiento (bloqueo de input)
+  }
 
   if (isAttacking) {
-    currentAnimKey = getAttackAnimKey(); // Forzar la animación de ataque // Sincronizar el sprite de ataque y salir del bucle de movimiento/idle
+    currentAnimKey = getAttackAnimKey(); // Forzar la animación de ataque
 
     const attackAnim = animSprites[currentAnimKey];
     if (attackAnim) {
@@ -265,9 +262,6 @@ function gameloop() {
       attackAnim.y = characterPos.y; // Aplicar escala horizontal correcta para ataques laterales (attack2)
 
       if (currentAnimKey === "attack2") {
-        // <<-- CORRECCIÓN: Invertimos la escala (multiplicamos por -1) para corregir el giro.
-        // Esto asume que el sprite de ataque lateral (attack2) está dibujado mirando
-        // en la dirección opuesta a la animación de caminar (walk4).
         attackAnim.scale.x = lastScaleX * -1;
       } else {
         // Asegurar que los ataques verticales (attack1, attack3) tengan escala positiva
@@ -275,8 +269,9 @@ function gameloop() {
       }
     }
     return; // Salir del gameloop para que no se ejecute la lógica de movimiento/idle
-  } // 2. --- LÓGICA DE MOVIMIENTO (Solo si NO está atacando) ---
+  }
 
+  // LÓGICA DE MOVIMIENTO (Solo si NO está atacando) ---
   if (keys[87]) {
     // W (Arriba)
     movedY = true;
@@ -305,8 +300,9 @@ function gameloop() {
     currentAnimKey = "walk4";
   }
 
-  moving = movedX || movedY; // 3. --- LÓGICA DE ANIMACIÓN (Caminata/Idle) ---
+  moving = movedX || movedY;
 
+  // 3. LÓGICA DE ANIMACIÓN (Caminata/Idle)
   // Resolver colisiones contra obstáculos para que la granjera no atraviese rocas
   try {
     if (typeof ObstacleManager !== "undefined") {
@@ -404,7 +400,7 @@ function gameloop() {
       // Si la animación idle existe, la mostramos y sincronizamos
       idleAnim.x = characterPos.x;
       idleAnim.y = characterPos.y;
-      idleAnim.visible = true; // Aplicar la escala horizontal guardada (solo para idle4)
+      idleAnim.visible = true;
 
       if (idleKey === "idle4") {
         idleAnim.scale.x = lastScaleX;
@@ -421,12 +417,10 @@ function gameloop() {
       granjera.y = characterPos.y;
       granjera.visible = true;
     }
-  } // 4. --- LÓGICA DE INTERACCIÓN Y MATANZA (Movida a performKillLogic) --- // Esta sección se ha movido a una función separada para ser llamada // cuando se inicia el ataque, en lugar de cada frame.
+  }
 }
 
-// ===============================================
 // 🔪 FUNCIÓN DE LÓGICA DE MATANZA (REFACTORIZADA) 🔪
-// ===============================================
 
 function performKillLogic() {
   if (typeof flock === "undefined") return; // Obtenemos la posición real de la granjera
