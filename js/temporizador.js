@@ -1,5 +1,5 @@
 (function () {
-  const tiempo_inicial = 120; // las fases de propagación ocurren a 70s y 10s
+  const tiempo_inicial = 150; // las fases de propagación ocurren a 90s y 10s
   let timeLeft = tiempo_inicial;
   let timerInterval = null;
   let pixiTimerText = null;
@@ -17,11 +17,7 @@
     strokeThickness: 4,
   });
 
-  /**
-   * Formatea los segundos restantes a un string "HH:MM:SS".
-   * @param {number} seconds Segundos totales.
-   * @returns {string} Tiempo formateado.
-   */
+  // Formatea los segundos restantes a un string "HH:MM:SS".
   function formatTime(seconds) {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -31,9 +27,7 @@
       .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   }
 
-  /**
-   * Dibuja o actualiza el recuadro de fondo basándose en el tamaño del texto.
-   */
+  // Dibuja o actualiza el recuadro de fondo basándose en el tamaño del texto.
   function redrawBackground() {
     if (!timerBackgroundRect || !pixiTimerText || !timerContainer) return;
 
@@ -43,14 +37,14 @@
     const paddingX = 20; // Espaciado horizontal interno
     const paddingY = 15; // Espaciado vertical interno
 
-    // 1. Calcular las dimensiones
+    // Calcular las dimensiones
     const totalHeight = pixiTimerText.height + 2 * paddingY;
     const totalWidth = pixiTimerText.width + 2 * paddingX;
 
-    // 2. Dibujar el Recuadro Negro con menos opacidad y bordes redondeados
+    // Dibujar el Recuadro Negro con menos opacidad y bordes redondeados
     timerBackgroundRect.beginFill(0x000000, 0.4); // Fondo negro con 40% de opacidad
 
-    // Dibujar el rectángulo redondeado (0, 0 es la esquina superior izquierda del contenedor)
+    // Dibujar el rectángulo redondeado
     timerBackgroundRect.drawRoundedRect(
       0, // x
       0, // y
@@ -60,13 +54,11 @@
     );
     timerBackgroundRect.endFill();
 
-    // 3. Ajustar la posición del texto DENTRO del contenedor
-    // (Asegurar que el texto esté centrado respecto al fondo)
+    // Ajustar la posición del texto dentro del contenedor
     pixiTimerText.x = paddingX;
     pixiTimerText.y = paddingY;
 
-    // 4. Ajustar la posición del contenedor (Centrar en la pantalla)
-    // El 'anchor' de pixiTimerText ya no es 0.5, por lo que centramos el contenedor
+    // Ajustar la posición del contenedor (Centrar en la pantalla)
     if (typeof app !== "undefined" && app.renderer) {
       timerContainer.x = (app.renderer.width - totalWidth) / 2;
     } else {
@@ -74,9 +66,7 @@
     }
   }
 
-  /**
-   * Inicializa el texto del temporizador y el recuadro de fondo.
-   */
+  // Inicializa el texto del temporizador y el recuadro de fondo.
   function createPixiTimer() {
     // colocarlo en `hudContainer` si existe, sino en stage
     const parent =
@@ -93,36 +83,33 @@
     }
 
     try {
-      // 1. Crear el Contenedor para agrupar
+      // Crear el Contenedor para agrupar
       if (!timerContainer) {
         timerContainer = new PIXI.Container();
-        // Posición Y fija cerca de la parte superior
-        timerContainer.y = 10;
+        timerContainer.y = 10; // Posición Y fija cerca de la parte superior
         parent.addChild(timerContainer);
       }
 
-      // 2. Crear el Graphics para el fondo
+      // Crear el Graphics para el fondo
       if (!timerBackgroundRect) {
         timerBackgroundRect = new PIXI.Graphics();
         timerContainer.addChildAt(timerBackgroundRect, 0); // Añadir primero para que esté detrás
       }
 
-      // 3. Crear el Texto
+      // Crear el Texto
       if (!pixiTimerText) {
         pixiTimerText = new PIXI.Text(formatTime(timeLeft), style);
-        // Anchor.set(0) para que 0,0 sea la esquina superior izquierda del texto
-        pixiTimerText.anchor.set(0);
+        pixiTimerText.anchor.set(0); // Anchor.set(0) para que 0,0 sea la esquina superior izquierda del texto
         timerContainer.addChild(pixiTimerText);
       }
 
-      // 4. Dibujar el fondo inicial y posicionar
+      // Dibujar el fondo inicial y posicionar
       redrawBackground();
 
-      // 5. Adaptación al resize
+      // Adaptación al resize
       if (typeof app !== "undefined" && app.renderer) {
         app.renderer.on("resize", () => {
-          // El fondo se redibuja y el contenedor se recentra
-          redrawBackground();
+          redrawBackground(); // El fondo se redibuja y el contenedor se recentra
         });
       }
     } catch (e) {
@@ -130,36 +117,34 @@
     }
   }
 
-  /**
-   * Actualiza el valor del tiempo mostrado y aplica efectos de parpadeo.
-   */
+  // Actualiza el valor del tiempo mostrado y aplica efectos de parpadeo.
   function updatePixiDisplay() {
     if (!pixiTimerText) return;
 
     const oldWidth = pixiTimerText.width;
     pixiTimerText.text = formatTime(Math.max(0, timeLeft));
 
-    // Si el ancho del texto cambia (ej. de 1:59 a 1:00), redibujar el fondo
+    // Si el ancho del texto cambia, redibujar el fondo
     if (pixiTimerText.width !== oldWidth) {
       redrawBackground();
     }
 
-    // Estructura de dos fases de propagacion: una entre 80-70s y otra entre 10-0s
-    if ((timeLeft <= 80 && timeLeft > 70) || (timeLeft <= 10 && timeLeft > 0)) {
+    // Estructura de dos fases de propagacion: una entre 100-90s y otra entre 10-0s
+    if (
+      (timeLeft <= 100 && timeLeft > 90) ||
+      (timeLeft <= 10 && timeLeft > 0)
+    ) {
       // parpadeo entre rojo y blanco en los últimos 10 segundos de cada fase
       blinkState = !blinkState;
       pixiTimerText.style.fill = blinkState ? "#ff0000" : "#ffffff";
     } else if (timeLeft === 0) {
       pixiTimerText.style.fill = "#ff0000";
     } else {
-      // fuera de los segundos críticos, mantener blanco
-      pixiTimerText.style.fill = "#ffffff";
+      pixiTimerText.style.fill = "#ffffff"; // fuera de los segundos críticos, mantener blanco
     }
   }
 
-  /**
-   * Lógica de decremento del temporizador y control de fases.
-   */
+  // Lógica de decremento del temporizador y control de fases.
   function tick() {
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
@@ -167,7 +152,7 @@
       timeLeft = 0;
       updatePixiDisplay();
 
-      // 1. **Control de Sangre al llegar a 0**
+      // Control de Sangre al llegar a 0
       if (typeof window.bloodEffectActive !== "undefined") {
         window.bloodEffectActive = false;
         window.bloodMaxStatic = true;
@@ -176,9 +161,6 @@
       // Al terminar el temporizador, todas las ovejas blancas restantes se convierten a negras
       if (typeof window.convertFractionWhiteToBlack === "function") {
         window.convertFractionWhiteToBlack(1);
-        console.log(
-          "Temporizador finalizado. Todas las ovejas blancas convertidas a negras."
-        );
       }
 
       // game over fade out
@@ -197,8 +179,8 @@
       }
     }
 
-    // Fase de conversión 1: Cuando faltan exactamente 50s (en el tiempo 70s), convertir 1/9 de blancas
-    if (timeLeft === 70 && !firstPhaseConverted) {
+    // al segundo 90 convertir 1/9 de blancas
+    if (timeLeft === 90 && !firstPhaseConverted) {
       firstPhaseConverted = true;
       if (typeof window.convertFractionWhiteToBlack === "function") {
         window.convertFractionWhiteToBlack(1 / 9);
@@ -209,9 +191,7 @@
     updatePixiDisplay();
   }
 
-  /**
-   * Inicia el temporizador.
-   */
+  // Inicia el temporizador.
   function startTimer() {
     if (!pixiTimerText) createPixiTimer();
     if (timerInterval) clearInterval(timerInterval);
@@ -233,9 +213,7 @@
     timerInterval = setInterval(tick, 1000);
   }
 
-  /**
-   * Detiene el temporizador.
-   */
+  // Detiene el temporizador.
   function stopTimer() {
     if (timerInterval) {
       clearInterval(timerInterval);

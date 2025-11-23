@@ -17,6 +17,7 @@
     if (startScreenContainer) return;
 
     startScreenContainer = new PIXI.Container();
+    startScreenContainer.zIndex = 100; // Agregar un zIndex alto como precaución
 
     // Fondo negro que cubre toda la pantalla
     const background = new PIXI.Graphics();
@@ -100,12 +101,13 @@
     }
     if (startScreenContainer) {
       startScreenContainer.visible = true;
+      // Esto asegura que se dibuje encima de todos los demás elementos.
       pixiApp.stage.setChildIndex(
         startScreenContainer,
         pixiApp.stage.children.length - 1
       );
       screenShown = true;
-      console.log("[START SCREEN] Start screen shown.");
+      console.log("[START SCREEN] Start screen shown and moved to front.");
     }
   }
 

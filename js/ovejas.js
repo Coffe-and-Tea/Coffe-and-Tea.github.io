@@ -903,5 +903,5 @@ function convertFractionWhiteToBlack(fraction) {
     window.updateCounters(flock.length, staticSheep.length);
 }
 
-// Exponer la función globalmente para que otros scripts (p.ej. temporizador) puedan llamarla
+// Exponer la función globalmente para que otros scripts puedan llamarla
 window.convertFractionWhiteToBlack = convertFractionWhiteToBlack;

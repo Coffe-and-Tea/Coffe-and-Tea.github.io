@@ -1,6 +1,3 @@
-// Posición central del personaje: Esta es la "verdad" de la posición.
-// Inicializar en el centro del MUNDO (WORLD_WIDTH y WORLD_HEIGHT)
-// Fallback al viewport si no están disponibles
 let characterPos = {
   x:
     typeof WORLD_WIDTH !== "undefined"
@@ -18,13 +15,13 @@ let characterPos = {
 
 console.log("granjera.js cargado. characterPos:", characterPos);
 
-// variable de estado: Para recordar la última dirección de caminata (Abajo por defecto).
+// Para recordar la última dirección de caminata
 let lastDirectionKey = "idle3";
 
-// variable clave: Almacena la escala horizontal final (-1 para izquierda, +1 para derecha).
+// Almacena la escala horizontal final
 let lastScaleX = 1;
 
-// NUEVA VARIABLE: Estado de ataque
+// Estado de ataque
 let isAttacking = false;
 
 // Agregamos un sprite estatico (usado como fallback si falla la carga o el idle)
@@ -40,13 +37,11 @@ else app.stage.addChild(granjera);
 let keys = {};
 const animSprites = {}; // Para guardar las animaciones
 
-const KILL_KEY_CODE = 32; // Código de tecla para matar (32 es la barra espaciadora)
+const KILL_KEY_CODE = 32; // Código de tecla para matar aka barra espaciadora
 const KILL_RADIUS = 40; // Distancia máxima en píxeles para que la granjera pueda interactuar/matar
 const FARMER_RADIUS = 24; // Radio aproximado para evitar obstaculos
 
-// ===========================================
 // *** FUNCIONES HELPERS ***
-// ===========================================
 
 // Oculta todos los sprites animados y detiene su reproducción
 function hideAllAnims() {
@@ -68,7 +63,7 @@ function showAnim(key) {
   if (!s.playing) s.play();
 }
 
-// Función robusta para leer animaciones del JSON (Mantenida igual)
+// Función robusta para leer animaciones del JSON
 function setupFromSheetData(sheetData, baseImagePath, keyName) {
   if (!sheetData || !sheetData.animations) {
     console.warn(
@@ -117,7 +112,7 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
       animSprite.animationSpeed = 0.1; // Velocidad lenta para reposo
     } else if (keyName.startsWith("attack")) {
       animSprite.animationSpeed = 0.25; // Velocidad rápida para ataque
-      animSprite.loop = false; // El ataque NO se repite
+      animSprite.loop = false; // El ataque no se repite
     } else {
       animSprite.animationSpeed = 0.15; // Velocidad normal para caminar
     }
@@ -126,7 +121,7 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
     animSprite.scale.x = Math.abs(animSprite.scale.x || 1);
     if (typeof world !== "undefined") world.addChild(animSprite);
     else app.stage.addChild(animSprite);
-    if (keyName) animSprites[keyName] = animSprite; // Lógica para devolver al estado IDLE después de un ataque
+    if (keyName) animSprites[keyName] = animSprite; // Lógica para devolver al estado idle después de un ataque
 
     if (keyName.startsWith("attack")) {
       animSprite.onComplete = () => {
@@ -141,9 +136,7 @@ function setupFromSheetData(sheetData, baseImagePath, keyName) {
   }
 }
 
-// =======================================================
 // *** CARGA DE ANIMACIONES ***
-// =======================================================
 
 // Lista de todas las animaciones a cargar
 const sheets = [
@@ -152,10 +145,10 @@ const sheets = [
   "walk4", // Izquierda/Derecha
   "idle2", // Reposo Arriba
   "idle3", // Reposo Abajo
-  "idle4", // Reposo Derecha
-  "attack1", // ATAQUE Arriba
-  "attack2", // ATAQUE Izquierda/Derecha
-  "attack3", // ATAQUE Abajo
+  "idle4", // Reposo Izquierda/Derecha
+  "attack1", // ataque Arriba
+  "attack2", // ataque Izquierda/Derecha
+  "attack3", // ataque Abajo
 ];
 
 if (
@@ -168,7 +161,7 @@ if (
     sheets.forEach((s) => {
       const res = resources[s];
       if (res && res.data) {
-        // Acceso seguro a la ruta de la imagen: Asume s.png si el meta.image falla
+        // Acceso seguro a la ruta de la imagen
         const baseImage =
           res.data.meta && res.data.meta.image
             ? `animaciones/${res.data.meta.image}`
@@ -183,7 +176,7 @@ if (
     });
   });
 } else {
-  // Fallback: fetch cada JSON
+  // Fallback
   sheets.forEach((s) => {
     fetch(`animaciones/${s}.json`)
       .then((r) => r.json())
@@ -197,11 +190,9 @@ if (
   });
 }
 
-// ===========================================
 // *** INPUT Y GAMELOOP ***
-// ===========================================
 
-// Agregamos el movimiento "WASD" del teclado
+// moviemiento wasd
 window.addEventListener("keydown", keysDown);
 window.addEventListener("keyup", keysUp);
 
@@ -233,7 +224,7 @@ function getAttackAnimKey() {
   }
 }
 
-// Gameloop para el movimiento, animación y la INTERACCIÓN DE MATANZA
+// Gameloop para el movimiento, animación y la mecanica de ataque
 function gameloop() {
   let moving = false;
   const speed = 4;
@@ -242,7 +233,7 @@ function gameloop() {
   let movedX = false;
   let movedY = false;
 
-  // 1. LÓGICA DE ATAQUE (Prioridad Máxima)
+  // 1. LÓGICA DE ATAQUE
   if (keys[KILL_KEY_CODE] && !isAttacking && typeof flock !== "undefined") {
     isAttacking = true;
     keys[KILL_KEY_CODE] = false; // Consumir la pulsación para que no sea automático
@@ -259,19 +250,19 @@ function gameloop() {
       hideAllAnims();
       showAnim(currentAnimKey);
       attackAnim.x = characterPos.x;
-      attackAnim.y = characterPos.y; // Aplicar escala horizontal correcta para ataques laterales (attack2)
+      attackAnim.y = characterPos.y; // Aplicar escala horizontal correcta para ataques laterales
 
       if (currentAnimKey === "attack2") {
         attackAnim.scale.x = lastScaleX * -1;
       } else {
-        // Asegurar que los ataques verticales (attack1, attack3) tengan escala positiva
+        // Asegurar que los ataques verticales tengan escala positiva
         attackAnim.scale.x = Math.abs(attackAnim.scale.x || 1);
       }
     }
     return; // Salir del gameloop para que no se ejecute la lógica de movimiento/idle
   }
 
-  // LÓGICA DE MOVIMIENTO (Solo si NO está atacando) ---
+  // LÓGICA DE MOVIMIENTO
   if (keys[87]) {
     // W (Arriba)
     movedY = true;
@@ -302,8 +293,7 @@ function gameloop() {
 
   moving = movedX || movedY;
 
-  // 3. LÓGICA DE ANIMACIÓN (Caminata/Idle)
-  // Resolver colisiones contra obstáculos para que la granjera no atraviese rocas
+  // LÓGICA DE ANIMACIÓN
   try {
     if (typeof ObstacleManager !== "undefined") {
       ObstacleManager.resolvePoint(characterPos, FARMER_RADIUS);
@@ -331,7 +321,7 @@ function gameloop() {
     }
   } catch (e) {}
 
-  // Camara: centrar el world en la granjera, con límites para no mostrar fuera del mundo
+  // centrar el world en la granjera, con límites para no mostrar fuera del mundo
   try {
     if (typeof world !== "undefined") {
       const sw = app.screen.width;
@@ -378,7 +368,7 @@ function gameloop() {
       anim.scale.x = Math.abs(anim.scale.x || 1); // Actualizar la última dirección para W y S
 
       if (currentAnimKey === "walk1") lastDirectionKey = "idle2";
-      if (currentAnimKey === "walk3") lastDirectionKey = "idle3"; // Para walk1 y walk3, restablecemos la escala X de reposo a 1
+      if (currentAnimKey === "walk3") lastDirectionKey = "idle3";
 
       lastScaleX = Math.abs(lastScaleX);
     }
@@ -388,7 +378,7 @@ function gameloop() {
   } else {
     // Animacion de idle
     hideAllAnims();
-    let idleKey = lastDirectionKey; // Si la última dirección de caminata fue "idle1" (izquierda), usamos el sprite "idle4"
+    let idleKey = lastDirectionKey; // Si la última dirección de caminata fue idle1, usamos idle4
 
     if (idleKey === "idle1") {
       idleKey = "idle4";
@@ -412,7 +402,7 @@ function gameloop() {
       if (!idleAnim.playing) idleAnim.play();
       granjera.visible = false;
     } else {
-      // Fallback (El idle NO CARGÓ): Mostramos el sprite estático
+      // Fallback
       granjera.x = characterPos.x;
       granjera.y = characterPos.y;
       granjera.visible = true;
@@ -420,7 +410,7 @@ function gameloop() {
   }
 }
 
-// 🔪 FUNCIÓN DE LÓGICA DE MATANZA (REFACTORIZADA) 🔪
+// Mecanica de ataque
 
 function performKillLogic() {
   if (typeof flock === "undefined") return; // Obtenemos la posición real de la granjera
@@ -442,20 +432,19 @@ function performKillLogic() {
       if (typeof animal.removeSelf === "function") {
         animal.removeSelf();
       } else {
-        // Fallback si removeSelf no existe (¡debes añadirlo a GoatBoid!)
+        // Fallback
         console.error("Falta el método removeSelf() en la clase del animal.");
         animal.sprite.visible = false;
         flock.splice(i, 1);
       }
       // Marcamos que matamos una blanca para provocar la transformación
       var killedWhite = true;
-      // Si la granjera solo puede matar un animal por pulsación de tecla, salimos:
-      // (Esto asegura que el ataque solo elimine uno por golpe)
+      // Si la granjera solo puede matar un animal por pulsación de tecla, salimos
       break;
     }
   }
 
-  // Si no matamos ninguna del flock, intentamos con las ovejas estáticas (staticSheep)
+  // Si no matamos ninguna del flock, intentamos con las ovejas estáticas
   if (typeof staticSheep !== "undefined") {
     for (let i = staticSheep.length - 1; i >= 0; i--) {
       const animal = staticSheep[i];
@@ -502,7 +491,6 @@ function performKillLogic() {
 
   // Revisar si se alcanzó la victoria (todas las ovejas negras muertas)
   if (typeof window.checkVictory === "function") {
-    console.log("[GRANJERA] Llamando a checkVictory()");
     window.checkVictory();
   }
 }
