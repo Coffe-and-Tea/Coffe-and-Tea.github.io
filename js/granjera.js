@@ -233,7 +233,7 @@ function getAttackAnimKey() {
       return "attack2"; // Usamos attack2
     case "idle4": // Derecha
     default:
-      return "attack2"; // <<-- CAMBIO: Usamos attack2 para la derecha también
+      return "attack2";
   }
 }
 

@@ -46,7 +46,7 @@ background.x = 0;
 background.y = 0;
 world.addChild(background);
 
-// --- Creación de las 4 Rocas en posiciones Fijas ---
+// Obstáculos del mundo: piedras, vallas y una casa abandonada
 const piedras = [];
 const rockPositions = [
   { x: WORLD_WIDTH * 0.25, y: WORLD_HEIGHT * 0.6 },
@@ -56,12 +56,10 @@ const rockPositions = [
 ];
 
 for (let i = 0; i < 4; i++) {
-  // Usamos el nombre de imagen que proporcionaste, asumiendo que es correcto
   const r = PIXI.Sprite.from("images/piedra.png");
   r.width = 90 + Math.random() * 40;
   r.height = (r.width * 0.7) | 0;
   r.anchor.set(0.5);
-  // Aplica el ligero desplazamiento aleatorio que definiste
   r.x = rockPositions[i].x + (Math.random() - 0.5) * 80;
   r.y = rockPositions[i].y + (Math.random() - 0.5) * 60;
   world.addChild(r);
@@ -89,24 +87,18 @@ for (let i = 0; i < 4; i++) {
 //   vallasHorizontales.push(r);
 // }
 
-// --- Creación de la ÚNICA Casa ---
 const casa = [];
-// Solo hay una posición central definida
-const casaPositions = [{ x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.4 }];
+const casaPositions = [{ x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.35 }];
 const c = PIXI.Sprite.from("images/granja_abandonada.png");
-c.width = 300;
-c.height = (c.width * 0.9) | 0;
+c.width = 350;
+c.height = (c.width * 0.95) | 0;
 c.anchor.set(0.5);
-
-// Posicionar la única casa en la posición central, aplicando el desplazamiento
-c.x = casaPositions[0].x + (Math.random() - 0.5) * 80;
-c.y = casaPositions[0].y + (Math.random() - 0.5) * 60;
+c.x = casaPositions[0].x;
+c.y = casaPositions[0].y;
 
 world.addChild(c);
 casa.push(c);
 
-// 2. REGISTRO DE OBSTÁCULOS (Barreras sólidas)
-// Concatenamos las rocas y la única casa.
 const todosLosObstaculos = [...piedras, ...casa];
 
 // Aseguramos que el array de obstáculos a registrar exista.
@@ -118,14 +110,12 @@ for (let r of todosLosObstaculos) {
     sprite: r,
     padding: 6,
     options: {
-      // Mantener como false para que actúen como paredes sólidas
       allowPassBehind: false,
     },
   });
 }
 
 // Iniciamos la pantalla de inicio cuando la ventana cargue
-// El timer se iniciará cuando el usuario presione "COMENZAR"
 window.addEventListener("load", () => {
   console.log("[GAME] Window loaded. Showing start screen.");
   if (typeof window.showStartScreen === "function") {

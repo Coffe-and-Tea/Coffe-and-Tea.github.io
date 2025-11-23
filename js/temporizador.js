@@ -1,11 +1,9 @@
-// temporizador.js (PIXI HUD)
-
-const tiempo_inicial = 120; // 30s primera fase + 50s segunda fase
+const tiempo_inicial = 120; // las fases de propagación ocurren a 70s y 10s
 let timeLeft = tiempo_inicial;
 let timerInterval = null;
 let pixiTimerText = null;
 let blinkState = false;
-let firstPhaseConverted = false; // flag para convertir 1/3 después de 30s
+let firstPhaseConverted = false;
 
 function formatTime(seconds) {
   const hours = Math.floor(seconds / 3600);
@@ -60,10 +58,7 @@ function updatePixiDisplay() {
   if (!pixiTimerText) return;
   pixiTimerText.text = formatTime(Math.max(0, timeLeft));
 
-  // Estructura: 80-50 (primera fase 30s), 50-0 (segunda fase 50s)
-  // Primera fase: parpadea cuando 60 > timeLeft >= 50 (últimos 10s de primera fase)
-  // Segunda fase: parpadea cuando 10 > timeLeft >= 0 (últimos 10s de segunda fase)
-
+  //Estrutura de dos fases de propagacion: una entre 80-70s y otra entre 10-0s
   if ((timeLeft <= 80 && timeLeft > 70) || (timeLeft <= 10 && timeLeft > 0)) {
     // parpadeo entre rojo y blanco en los últimos 10 segundos de cada fase
     blinkState = !blinkState;
@@ -89,21 +84,17 @@ function tick() {
       window.bloodMaxStatic = true; // Activar opacidad máxima fija
     }
 
-    // Al terminar los 60s totales:
-    // 1. Convertir todas las ovejas blancas restantes a negras
+    // Al terminar el temporizador, todas las ovejas blancas restantes se convierten a negras
     if (typeof window.convertFractionWhiteToBlack === "function") {
-      window.convertFractionWhiteToBlack(1); // convertir 100% de blancas
+      window.convertFractionWhiteToBlack(1);
       console.log(
         "Temporizador finalizado. Todas las ovejas blancas convertidas a negras."
       );
     }
 
-    // 2. Inicia el desvanecimiento de pantalla (Game Over UI)
+    // game over fade out
     if (typeof window.startScreenFadeIn === "function") {
       window.startScreenFadeIn();
-      console.log(
-        "Temporizador finalizado. Iniciando desvanecimiento de pantalla."
-      );
     }
     return;
   }
@@ -117,14 +108,11 @@ function tick() {
     }
   }
 
-  // Cuando faltan exactamente 50s (después de la primera fase), convertir 1/6 de blancas
+  // Cuando faltan exactamente 50s (después de la primera fase), convertir 1/9 de blancas
   if (timeLeft === 70 && !firstPhaseConverted) {
     firstPhaseConverted = true;
     if (typeof window.convertFractionWhiteToBlack === "function") {
-      window.convertFractionWhiteToBlack(1 / 8);
-      console.log(
-        "Primera fase completada. 1/4 de ovejas blancas convertidas a negras."
-      );
+      window.convertFractionWhiteToBlack(1 / 9);
     }
   }
 
