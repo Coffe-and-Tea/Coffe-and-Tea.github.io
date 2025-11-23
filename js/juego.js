@@ -50,7 +50,7 @@ world.addChild(background);
 const piedras = [];
 const rockPositions = [
   { x: WORLD_WIDTH * 0.25, y: WORLD_HEIGHT * 0.6 },
-  { x: WORLD_WIDTH * 0.6, y: WORLD_HEIGHT * 0.35 },
+  { x: WORLD_WIDTH * 0.7, y: WORLD_HEIGHT * 0.2 },
   { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.75 },
   { x: WORLD_WIDTH * 0.58, y: WORLD_HEIGHT * 0.56 },
 ];
@@ -90,8 +90,8 @@ for (let i = 0; i < 4; i++) {
 const casa = [];
 const casaPositions = [{ x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.35 }];
 const c = PIXI.Sprite.from("images/granja_abandonada.png");
-c.width = 350;
-c.height = (c.width * 0.95) | 0;
+c.width = 370;
+c.height = (c.width * 0.93) | 0;
 c.anchor.set(0.5);
 c.x = casaPositions[0].x;
 c.y = casaPositions[0].y;

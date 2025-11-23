@@ -788,22 +788,6 @@ function createMovingBlackSheep(x, y) {
       this.angle += this.angularSpeed;
       this.sprite.x = center.x + Math.cos(this.angle) * this.radius;
       this.sprite.y = center.y + Math.sin(this.angle) * this.radius;
-      // Limitar dentro de la pantalla
-      // const sw = app.screen.width;
-      // const sh = app.screen.height;
-
-      // ******* INICIO DE LA MODIFICACIÓN *******
-      // Se elimina la restricción de borde (clamp) sobre el centro (center)
-      // para permitir que la oveja negra pueda "vagabundear" por todo el escenario.
-
-      /*
-      // clamp center to screen
-      if (center.x < 8) center.x = 8;
-      if (center.y < 8) center.y = 8;
-      if (center.x > sw - 8) center.x = sw - 8;
-      if (center.y > sh - 8) center.y = sh - 8;
-      */
-      // ******* FIN DE LA MODIFICACIÓN *******
 
       // ajustar center si sprite colisiona contra bordes u obstáculos
       if (typeof ObstacleManager !== "undefined") {
