@@ -146,6 +146,11 @@
 
   // Lógica de decremento del temporizador y control de fases.
   function tick() {
+
+    if (window.juegoIniciado !== true) {
+        return; 
+    }
+    
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
       timerInterval = null;
@@ -195,6 +200,7 @@
   function startTimer() {
     if (!pixiTimerText) createPixiTimer();
     if (timerInterval) clearInterval(timerInterval);
+    window.juegoIniciado = false;
     timeLeft = tiempo_inicial;
     firstPhaseConverted = false;
     updatePixiDisplay();
