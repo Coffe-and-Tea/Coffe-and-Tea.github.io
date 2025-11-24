@@ -13,7 +13,7 @@ Cosas por terminar/implementar:
         - Hacer que las obejas negras se muevan y aparezcan en todo el mapa.    ✅
 
     Obstaculos:
-        - vallas (opcional).    (en proceso)
+        - vallas (opcional).    ✅
         - fardos (opcional).
         - rocas  (opcional).    ✅
         - granja.               ✅ --> armar colisiones ✅
@@ -26,10 +26,10 @@ Cosas por terminar/implementar:
             - Agregar contador de animales sanos.      ✅
             - Agregar contador de animales infectados. ✅
             - Agregar temporizador.                    ✅
-            - Agregar HUD bien diseñado.
+            - Agregar HUD bien diseñado.               ✅
 
     Pantallas: 
-        - Inicio: - Agregar iamgen con tuto.
+        - Inicio: - Agregar iamgen con tuto.    ✅
                   - Boton de comenzar.          ✅
 
         - Final: - Que la granjera se quede quieta cuando se pone la pantalla en negro cuando pierde.            ✅
@@ -44,19 +44,4 @@ Cosas por terminar/implementar:
         - Actualizar GDD.
         - Menu boton pausa.
         - ReadMe github (breve sinopsis).               ✅
-        - Arreglar botones (esteticamente hablando).
-
-
-
-
-
-
-
-Codigo util y funcional:
-    Hace que la granjera siga el puntero del mouse:
-        app.stage.interactive = true;
-        app.stage.on('pointermove', (event) => {
-            const pointerPosition = event.data.global;
-            granjera.x = pointerPosition.x;
-            granjera.y = pointerPosition.y;
-        });
+        - Arreglar botones (esteticamente hablando).    ✅
