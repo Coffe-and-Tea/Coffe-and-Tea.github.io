@@ -2,7 +2,6 @@
 const numGoats = 170;
 const flock = [];
 const loadedTextures = {}; // Almacena los frames de animación cargados
-console.log("ovejas.js cargado. numGoats=", numGoats);
 
 // DEBUG: confirmar que `app` y `window` existen en este punto
 console.log(
@@ -423,8 +422,8 @@ class GoatBoid {
   }
 }
 
-// **  2. FUNCIONES DE CARGA E INICIALIZACIÓN  **
-
+// FUNCIONES DE CARGA E INICIALIZACIÓN
+// esto deberia estar como metodo en juego.js pero no sabemos como implementarlo ahi todavia, asi que lo dejamos acá por ahora.
 function createFlock() {
   for (let i = 0; i < numGoats; i++) {
     const startX =
@@ -443,7 +442,6 @@ function createFlock() {
   if (typeof window.setInitialSheepCreated === "function") {
     window.setInitialSheepCreated();
   }
-  console.log(`Simulación Boid iniciada: ${numGoats} cabras.`);
 }
 
 function goatGameloop() {

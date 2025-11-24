@@ -14,14 +14,16 @@
     if (startScreenContainer) return;
 
     startScreenContainer = new PIXI.Container();
-    startScreenContainer.zIndex = 100; // Agregar un zIndex alto como precaución // Fondo negro que cubre toda la pantalla
+    startScreenContainer.zIndex = 100; // Agregar un zIndex alto como precaución
 
+    // Fondo negro que cubre toda la pantalla
     const background = new PIXI.Graphics();
     background.beginFill(0x000000);
     background.drawRect(0, 0, pixiApp.renderer.width, pixiApp.renderer.height);
     background.endFill();
-    startScreenContainer.addChild(background); // Estilo del título
+    startScreenContainer.addChild(background);
 
+    // Estilo del título
     const titleStyle = new PIXI.TextStyle({
       fontFamily: "Special Elite",
       fontSize: 72,
@@ -29,14 +31,16 @@
       stroke: 0x000000,
       strokeThickness: 4,
       align: "center",
-    }); // Título "THE DEVIL'S HERD"
+    });
 
+    // Título "THE DEVIL'S HERD"
     const title = new PIXI.Text("THE DEVIL'S HERD", titleStyle);
     title.anchor.set(0.5);
     title.x = pixiApp.renderer.width / 2;
     title.y = pixiApp.renderer.height / 2 - 150;
-    startScreenContainer.addChild(title); // Estilo del botón
+    startScreenContainer.addChild(title);
 
+    // Estilo del botón
     const buttonTextStyle = new PIXI.TextStyle({
       fontFamily: "Special Elite",
       fontSize: 48,
@@ -47,8 +51,9 @@
     });
 
     const buttonText = new PIXI.Text("COMENZAR", buttonTextStyle);
-    buttonText.anchor.set(0.5); // Fondo del botón (blanco)
+    buttonText.anchor.set(0.5);
 
+    // Fondo del botón (blanco)
     const button = new PIXI.Graphics();
     const buttonPadding = 30;
     const buttonWidth = buttonText.width + 2 * buttonPadding;
@@ -62,23 +67,26 @@
       buttonHeight,
       15
     );
-    button.endFill(); // Hacer el botón interactivo (CORRECCIÓN DE DEPRECACIÓN)
+    button.endFill();
 
-    button.eventMode = "static"; // Reemplaza button.interactive = true;
-    button.cursor = "pointer"; // Reemplaza button.buttonMode = true;
+    // Hacer el botón interactivo
+    button.eventMode = "static";
+    button.cursor = "pointer";
     button.on("pointerdown", () => {
       hideStartScreen();
       startGame();
-    }); // Posicionar botón
+    });
 
+    // Posicionar botón
     button.x = pixiApp.renderer.width / 2;
     button.y = pixiApp.renderer.height / 2 + 100;
     buttonText.x = pixiApp.renderer.width / 2;
     buttonText.y = pixiApp.renderer.height / 2 + 100;
 
     startScreenContainer.addChild(button);
-    startScreenContainer.addChild(buttonText); // Agregar contenedor al stage
+    startScreenContainer.addChild(buttonText);
 
+    // Agregar contenedor al stage
     pixiApp.stage.addChild(startScreenContainer);
   }
 
@@ -87,7 +95,8 @@
       createStartScreen();
     }
     if (startScreenContainer) {
-      startScreenContainer.visible = true; // Esto asegura que se dibuje encima de todos los demás elementos.
+      startScreenContainer.visible = true;
+      // Esto asegura que se dibuje encima de todos los demás elementos.
       pixiApp.stage.setChildIndex(
         startScreenContainer,
         pixiApp.stage.children.length - 1

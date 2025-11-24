@@ -395,7 +395,7 @@ function gameloop() {
       if (idleKey === "idle4") {
         idleAnim.scale.x = lastScaleX;
       } else {
-        // Asegurar que los idle verticales (idle2, idle3) tengan escala positiva
+        // Asegurar que los idle verticales tengan escala positiva
         idleAnim.scale.x = Math.abs(idleAnim.scale.x || 1);
       }
 
@@ -411,7 +411,6 @@ function gameloop() {
 }
 
 // Mecanica de ataque
-
 function performKillLogic() {
   if (typeof flock === "undefined") return; // Obtenemos la posición real de la granjera
 
