@@ -26,7 +26,7 @@ if (typeof app !== "undefined") {
   app.stage.sortableChildren = true;
 
   if (typeof hudContainer !== "undefined") {
-    hudContainer.zIndex = 5;
+    hudContainer.zIndex = 10;
   }
 }
 

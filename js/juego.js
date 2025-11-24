@@ -87,6 +87,15 @@ const hFencePositions = [
   { x: WORLD_WIDTH * 0.35, y: WORLD_HEIGHT * 0.1 },
   { x: WORLD_WIDTH * 0.75, y: WORLD_HEIGHT * 0.9 },
   { x: WORLD_WIDTH * 0.15, y: WORLD_HEIGHT * 0.8 },
+  { x: WORLD_WIDTH * 0.2, y: WORLD_HEIGHT * 0.5 },
+  { x: WORLD_WIDTH * 0.90, y: WORLD_HEIGHT * 0.2 },
+  { x: WORLD_WIDTH * 0.1, y: WORLD_HEIGHT * 0.1 },
+  { x: WORLD_WIDTH * 0.90, y: WORLD_HEIGHT * 0.7 },
+  { x: WORLD_WIDTH * 0.98, y: WORLD_HEIGHT * 0.6 },
+  { x: WORLD_WIDTH * 0.50, y: WORLD_HEIGHT * 0.9 },
+  { x: WORLD_WIDTH * 0.9, y: WORLD_HEIGHT * 0.9 },
+  { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.6 },
+  { x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.15 },
 ];
 
 // Tamaño distinto para vallas horizontales
@@ -114,10 +123,20 @@ const vFencePositions = [
   { x: WORLD_WIDTH * 0.3, y: WORLD_HEIGHT * 0.45 },
   { x: WORLD_WIDTH * 0.65, y: WORLD_HEIGHT * 0.65 },
   { x: WORLD_WIDTH * 0.4, y: WORLD_HEIGHT * 0.95 },
+  { x: WORLD_WIDTH * 0.1, y: WORLD_HEIGHT * 0.5 },
+  { x: WORLD_WIDTH * 0.95, y: WORLD_HEIGHT * 0.1 },
+  { x: WORLD_WIDTH * 0.2, y: WORLD_HEIGHT * 0.7 },
+  { x: WORLD_WIDTH * 0.80, y: WORLD_HEIGHT * 0.3 },
+  { x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.6 },
+  { x: WORLD_WIDTH * 0.50, y: WORLD_HEIGHT * 0.1 },
+  { x: WORLD_WIDTH * 0.9, y: WORLD_HEIGHT * 0.9 },
+  { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.6 },
+  { x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.15 },
+
 ];
 
 // Tamaño distinto para vallas verticales
-const V_FENCE_WIDTH = 40;
+const V_FENCE_WIDTH = 20;
 const V_FENCE_HEIGHT = 120;
 
 for (const pos of vFencePositions) {
