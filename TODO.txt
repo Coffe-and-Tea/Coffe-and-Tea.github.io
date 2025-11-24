@@ -1,6 +1,6 @@
 Cosas por terminar/implementar:
     Granjera:
-        - Ordenar el codigo de granjera. 
+        - Ordenar el codigo de granjera.                        ✅
         - Agregar animaciones de ataque.                        ✅
         - Movimiento de la camara.                              ✅
         - Acomodar animacion (le falta el pocho y la sombra).
@@ -38,7 +38,6 @@ Cosas por terminar/implementar:
     Tutorial:
         - Pantallas de lore.
         - Pantallas de controles.      ✅
-        - Implementarlas.
         
     Extras:
         - Actualizar GDD.
