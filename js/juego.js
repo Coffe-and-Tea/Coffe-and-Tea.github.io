@@ -46,7 +46,7 @@ background.x = 0;
 background.y = 0;
 world.addChild(background);
 
-// --- OBSTÁCULOS: Rocas ---
+// rocas:
 const piedras = [];
 const rockPositions = [
   { x: WORLD_WIDTH * 0.25, y: WORLD_HEIGHT * 0.6 },
@@ -66,7 +66,7 @@ for (let i = 0; i < 4; i++) {
   piedras.push(r);
 }
 
-// --- OBSTÁCULOS: Casa Abandonada ---
+// granja:
 const casa = [];
 const casaPositions = [{ x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.35 }];
 const c = PIXI.Sprite.from("images/granja_abandonada.png");
@@ -79,20 +79,20 @@ c.y = casaPositions[0].y;
 world.addChild(c);
 casa.push(c);
 
-// --- OBSTÁCULOS: Vallas Horizontales ---
+// vayas horizontales:
 const vallasHorizontales = [];
-// Posiciones para vallas horizontales (no se superponen con rocas/casa)
+// Posiciones para vallas horizontales
 const hFencePositions = [
   { x: WORLD_WIDTH * 0.1, y: WORLD_HEIGHT * 0.25 },
   { x: WORLD_WIDTH * 0.35, y: WORLD_HEIGHT * 0.1 },
   { x: WORLD_WIDTH * 0.75, y: WORLD_HEIGHT * 0.9 },
   { x: WORLD_WIDTH * 0.15, y: WORLD_HEIGHT * 0.8 },
   { x: WORLD_WIDTH * 0.2, y: WORLD_HEIGHT * 0.5 },
-  { x: WORLD_WIDTH * 0.90, y: WORLD_HEIGHT * 0.2 },
+  { x: WORLD_WIDTH * 0.9, y: WORLD_HEIGHT * 0.2 },
   { x: WORLD_WIDTH * 0.1, y: WORLD_HEIGHT * 0.1 },
-  { x: WORLD_WIDTH * 0.90, y: WORLD_HEIGHT * 0.7 },
+  { x: WORLD_WIDTH * 0.9, y: WORLD_HEIGHT * 0.7 },
   { x: WORLD_WIDTH * 0.98, y: WORLD_HEIGHT * 0.6 },
-  { x: WORLD_WIDTH * 0.50, y: WORLD_HEIGHT * 0.9 },
+  { x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.9 },
   { x: WORLD_WIDTH * 0.9, y: WORLD_HEIGHT * 0.9 },
   { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.6 },
   { x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.15 },
@@ -115,9 +115,9 @@ for (const pos of hFencePositions) {
   vallasHorizontales.push(valla);
 }
 
-// --- OBSTÁCULOS: Vallas Verticales ---
+// vallas verticales
 const vallasVerticales = [];
-// Posiciones para vallas verticales (no se superponen con rocas/casa)
+// Posiciones para vallas verticales
 const vFencePositions = [
   { x: WORLD_WIDTH * 0.9, y: WORLD_HEIGHT * 0.4 },
   { x: WORLD_WIDTH * 0.3, y: WORLD_HEIGHT * 0.45 },
@@ -126,13 +126,12 @@ const vFencePositions = [
   { x: WORLD_WIDTH * 0.1, y: WORLD_HEIGHT * 0.5 },
   { x: WORLD_WIDTH * 0.95, y: WORLD_HEIGHT * 0.1 },
   { x: WORLD_WIDTH * 0.2, y: WORLD_HEIGHT * 0.7 },
-  { x: WORLD_WIDTH * 0.80, y: WORLD_HEIGHT * 0.3 },
+  { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.3 },
   { x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.6 },
-  { x: WORLD_WIDTH * 0.50, y: WORLD_HEIGHT * 0.1 },
+  { x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.1 },
   { x: WORLD_WIDTH * 0.9, y: WORLD_HEIGHT * 0.9 },
   { x: WORLD_WIDTH * 0.8, y: WORLD_HEIGHT * 0.6 },
   { x: WORLD_WIDTH * 0.5, y: WORLD_HEIGHT * 0.15 },
-
 ];
 
 // Tamaño distinto para vallas verticales
@@ -152,13 +151,12 @@ for (const pos of vFencePositions) {
   vallasVerticales.push(valla);
 }
 
-// --- REGISTRO DE OBSTÁCULOS PARA COLISIÓN ---
-// Incluimos rocas, casa, Vallas Horizontales Y Vallas Verticales
+// registro de obstáculos colisionables:
 const todosLosObstaculos = [
   ...piedras,
   ...casa,
   ...vallasHorizontales,
-  ...vallasVerticales, // ¡Ambos tipos de vallas son ahora obstáculos colisionables!
+  ...vallasVerticales,
 ];
 
 // Aseguramos que el array de obstáculos a registrar exista.

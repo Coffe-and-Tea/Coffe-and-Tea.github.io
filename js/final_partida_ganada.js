@@ -27,7 +27,7 @@
 
   let winContainer = null;
 
-  // --- 1. Lógica de UI y Redimensionamiento ---
+  // Lógica de UI y Redimensionamiento
 
   function updateOverlaySize() {
     overlay.clear();
@@ -50,7 +50,7 @@
 
     winContainer = new PIXI.Container();
 
-    // 1. Título "GANASTE"
+    // Para el titulo "ganaste"
     const winText = new PIXI.Text("¡GANASTE!", WIN_TEXT_STYLE);
 
     // Fondo semi-transparente
@@ -70,7 +70,7 @@
     winContainer.addChild(textBackground);
     winContainer.addChild(winText);
 
-    // 2. Botón "JUGAR DE NUEVO"
+    // otón "JUGAR DE NUEVO"
     const BUTTON_STYLE = Object.assign({}, WIN_TEXT_STYLE, {
       fontSize: 24,
       fill: 0x000000,
@@ -99,14 +99,6 @@
     button.interactive = true;
     button.buttonMode = true;
 
-    // Listener para el click que RECARGA la página
-    button.on("pointerdown", () => {
-      console.log(
-        "[WIN CONTROLLER] Botón JUGAR DE NUEVO presionado. Recargando página..."
-      );
-      window.location.reload();
-    });
-
     button.y = 50;
     buttonText.y = 50;
     winContainer.addChild(button);
@@ -119,19 +111,15 @@
     pixiApp.stage.addChild(winContainer);
   }
 
-  // --- 2. Lógica de Verificación y Ticker de Juego ---
-
+  // Lógica de Verificación y Ticker de Juego
   pixiApp.ticker.add(() => {
-    // A) Controlar la atenuación (Fade)
+    // Controlar fade
     if (fadingIn) {
       overlayAlpha += fadeInSpeed;
 
       if (overlayAlpha >= targetAlpha) {
         overlayAlpha = targetAlpha;
         fadingIn = false;
-        console.log(
-          `[WIN CONTROLLER] Fade-in finished at ${targetAlpha * 100}%.`
-        );
 
         // Mostrar la UI de Victoria
         createWinUI();
@@ -156,10 +144,6 @@
 
     if (!gameWon && timerFinished && allBlackSheepFound) {
       gameWon = true; // Prevenir múltiples llamadas
-      console.log(
-        "[WIN CONTROLLER] ¡Condición de Victoria alcanzada! Iniciando Fade."
-      );
-
       // Iniciar la atenuación
       fadingIn = true;
     }
