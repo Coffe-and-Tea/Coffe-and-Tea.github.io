@@ -426,11 +426,11 @@
     console.log("[FADE CONTROLLER] Ovejas iniciales detectadas.");
   };
 
-  // Función para revisar la victoria manualmente (llamada después de matar una oveja)
+  // Función para revisar la victoria manualmente
   window.checkVictory = function () {
     console.log("[VICTORY CHECK] Función llamada");
 
-    // Acceder a staticSheep a través de window (expuesto desde ovejas.js)
+    // Acceder a staticSheep a través de window
     const staticSheepArray =
       typeof window.staticSheep !== "undefined"
         ? window.staticSheep
@@ -449,7 +449,7 @@
       `[VICTORY CHECK] Estado del juego: gameStarted=${gameStarted}, hasInitialSheep=${hasInitialSheep}, isGameWon=${isGameWon}, staticSheep.length=${staticSheepArray.length}, fadingIn=${fadingIn}`
     );
 
-    // Verificar si se cumplen TODAS las condiciones de victoria
+    // Verificar si se cumplen todas las condiciones de victoria
     if (
       gameStarted &&
       hasInitialSheep &&

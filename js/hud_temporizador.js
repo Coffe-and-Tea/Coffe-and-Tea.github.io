@@ -7,3 +7,5 @@
 // banner.x = WORLD_WIDTH / 2;
 // banner.y = WORLD_HEIGHT / 2;
 // world.addChild(banner);
+
+// para aplicar en un futuro.

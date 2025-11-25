@@ -31,7 +31,7 @@ document.body.appendChild(app.view);
 const WORLD_WIDTH = app.screen.width * 2;
 const WORLD_HEIGHT = app.screen.height * 2;
 
-// Creamos un contenedor para todo el mundo (la "escena") y otro para HUD en pantalla fija
+// Creamos un contenedor para todo el mundo y otro para HUD en pantalla fija
 const world = new PIXI.Container();
 const hudContainer = new PIXI.Container();
 app.stage.addChild(world);
@@ -175,7 +175,6 @@ for (let r of todosLosObstaculos) {
 
 // Iniciamos la pantalla de inicio cuando la ventana cargue
 window.addEventListener("load", () => {
-  console.log("[GAME] Window loaded. Showing start screen.");
   if (typeof window.showStartScreen === "function") {
     window.showStartScreen();
   }

@@ -1,9 +1,8 @@
-//OVERLAY SANGRE 
-window.bloodEffectActive = false; 
+//OVERLAY SANGRE
+window.bloodEffectActive = false;
 window.bloodMaxStatic = false;
 
-
-// Capa de sangre ---------------------------------------------------
+// Capa de sangre
 const sangre = PIXI.Sprite.from("images/sangre.png");
 sangre.width = window.innerWidth;
 sangre.height = window.innerHeight;
@@ -12,8 +11,7 @@ sangre.x = 0;
 sangre.y = 0;
 sangre.alpha = 0;
 
-
-// Variables para el efecto de titileo ------------------------------
+// Variables para el efecto de titileo
 let bloodOpacityDirection = 1;
 let bloodOpacitySpeed = 0.01;
 let bloodMinOpacity = 0.2;
@@ -32,13 +30,12 @@ if (typeof app !== "undefined") {
   }
 }
 
-
-// Animación del efecto de sangre -----------------------------------
+// Animación del efecto de sangre
 if (typeof app !== "undefined") {
   app.ticker.add(() => {
     if (window.bloodMaxStatic) {
       sangre.alpha = bloodMaxOpacity;
-      return; 
+      return;
     }
 
     if (window.bloodEffectActive) {
@@ -52,7 +49,7 @@ if (typeof app !== "undefined") {
         bloodOpacityDirection = 1;
       }
     } else {
-      sangre.alpha = 0; 
+      sangre.alpha = 0;
     }
   });
 }
